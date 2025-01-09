@@ -42,7 +42,7 @@ a {
 }
 
 .custom-background {
-  background-color: #202020; /* Arkaplan rengi */
+  background-color: #202020;
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -58,46 +58,46 @@ a {
 }
 
 .sign-in-button {
-  width: 320px; /* Yatay olarak tam genişlik */
-  background-color: #c2a061; /* Sarı renk */
-  border: none; /* Border'ı kaldırabiliriz, isteğe bağlı */
-  color: white; /* Yazı rengi siyah */
-  padding: 10px 0; /* Yükseklik için padding */
-  font-size: 16px; /* Yazı boyutu */
-  text-align: center; /* Metni ortalamak */
+  width: 320px;
+  background-color: #c2a061; 
+  border: none; 
+  color: white; 
+  padding: 10px 0; 
+  font-size: 16px; 
+  text-align: center; 
   border-radius: 10px;
 }
 
 .search-bar {
-  background-color: #444444 !important; /* Gri arka plan rengi */
-  color: #c5c5c5 !important; /* Yazı rengi siyah veya koyu gri */
-  border: 1px solid #c2a061 !important; /* Gri kenarlık */
+  background-color: #444444 !important;
+  color: #c5c5c5 !important; 
+  border: 1px solid #c2a061 !important;
 }
 
 .search-bar:focus {
-  background-color: #e0e0e0; /* Focus olduğunda daha koyu gri */
-  border-color: #aaa; /* Focus olduğunda daha belirgin kenarlık */
+  background-color: #e0e0e0; 
+  border-color: #aaa; 
 }
 
 .search-icon {
   color: white !important;
-  background-color: #444444 !important; /* Gri arka plan */
-  padding: 5px; /* İkonun etrafında biraz boşluk */
-  border-radius: 50%; /* Yuvarlak köşeler */
+  background-color: #444444 !important; 
+  padding: 5px; 
+  border-radius: 50%; 
   border: 1px solid #c2a061 !important;
 }
 
-/* Filtreleme kutusunun konumu ve stilini belirleyelim */
+/* Filtreleme kutusunun konumu ve stili*/
 .filter-container {
-  position: fixed; /* Sol tarafta sabit konumda */
-  top: 100px; /* Navbar'ın hemen altında olacak şekilde */
+  position: fixed;
+  top: 100px; 
   left: 12px;
-  width: 230px; /* Filtreleme kutusunun genişliği */
+  width: 230px; 
   height: 80%;
   padding: 10px;
   background-color: #282828;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  z-index: 100; /* Diğer içeriklerin üstünde görünmesi için */
+  z-index: 100; 
 }
 
 .dropdown-container {
@@ -116,13 +116,11 @@ a {
   text-align: left;
 }
 
-/* Silah Türü menüsü en üste gelsin */
 .dropdown-horizontal {
   margin-top: 20px;
 
 }
 
-/* Diğer dropdown menülerinin dikey düzenini bozmamak için */
 .dropdown-menu {
   display: block;
   position: relative;
@@ -133,18 +131,18 @@ a {
   display: flex;
   flex-direction: column;
   position: absolute;
-  left: 100%; /* Menü sağa doğru açılacak */
-  top: 0; /* Menü Silah Türü yazısının hizasında olacak */
-  margin-left: 10px; /* Araya biraz boşluk ekleyelim */
+  left: 100%; 
+  top: 0; 
+  margin-left: 10px; 
   height: 80%;
 }
 
 /* Silah Türü menüsüne tıklandığında sağa doğru açılacak menüler */
 .extra-dropdowns .dropdown-menu {
-  display: none; /* Varsayılan olarak gizli */
+  display: none; 
   position: absolute;
-  left: 100%; /* Menü sağa doğru açılacak */
-  top: 0; /* Silah Türü butonunun üst kısmında hizalanacak */
+  left: 100%; 
+  top: 0; 
   background-color: #282828;
   border: 0px;
   border-radius: 0%;
@@ -153,132 +151,118 @@ a {
 
 .extra-dropdowns .dropdown-menu .dropdown-item {
   display: flex;
-  justify-content: flex-end !important; /* Checkbox'ı sağa hizalar */
-  align-items: center; /* Vertikal hizalama */
+  justify-content: flex-end !important; 
+  align-items: center; 
   padding: 8px 15px;
 }
 
 .extra-dropdowns .dropdown-menu .dropdown-item input[type="checkbox"] {
-  margin-right: 10px; /* Checkbox ile yazı arasına boşluk ekleyelim */
-  order: 1; /* Checkbox'ı sağa alıyoruz */
+  margin-right: 10px; 
+  order: 1; 
 }
 
-/* Seçenek yazısının sola hizalanmasını sağlıyoruz */
 .extra-dropdowns .dropdown-menu .dropdown-item span {
-  order: 2; /* Yazıyı sola alıyoruz */
+  order: 2; 
 }
 
-/* Silah Türü menüsüne tıklandığında sağa doğru açılacak menülerin görünmesini sağla */
 .extra-dropdowns .dropdown:hover .dropdown-menu {
-  display: block; /* Menü tıklandığında göster */
+  display: block; 
 }
 
-
-/* Silah Türü butonunun arka plan rengini ve yazı rengini değiştirelim */
 .dropdown-horizontal .dropdown-toggle {
-  background-color: #282828; /* Sarı renk */
-  color: #fff; /* Beyaz yazı rengi */
+  background-color: #282828;
+  color: #fff;
   border: 0px solid;
   border-radius: 0%;
   
 }
 
 .dropdown-horizontal .dropdown-toggle:hover {
-  background-color: #505050; /* Hover durumunda biraz daha koyu sarı */
+  background-color: #505050; 
 
 }
 
-/* Diğer dropdown butonları için stil */
 .dropdown-toggle {
-  width: 200px; /* Butonun genişliğini %100 yaparak tüm alanı kaplamasını sağlarız */
-  padding: 15px 20px; /* Yüksekliği artırmak için padding değerlerini değiştirebiliriz */
-  background-color: #282828; /* Mavi renk */
-  color: #fff; /* Beyaz yazı rengi */
+  width: 200px;
+  padding: 15px 20px;
+  background-color: #282828; 
+  color: #fff; 
 }
 
 .dropdown-toggle:hover {
-  background-color: #505050; /* Hover durumunda koyu mavi */
+  background-color: #505050; 
 
 }
-/* Checkbox'ların boyutunu büyütelim */
-/* Dropdown menülerin içerdiği checkbox ile yazı arasındaki boşluğu kaldırmak için */
+
 .form-check {
-  margin-bottom: 0; /* Checkbox ile etiket arasındaki boşluğu sıfırlıyoruz */
-  margin-top: 0; /* Üstten de boşluk olmamalı */
+  margin-bottom: 0;
+  margin-top: 0;
   border: none !important;
   box-shadow: none !important;
 }
 
 .form-check-input {
-  width: 20px; /* Daha büyük bir kutu */
+  width: 20px;
   height: 20px;
-  border: 2px solid #ccc; /* Gri border ekleyelim */
-  transition: all 0.3s ease-in-out; /* Geçiş efekti ekleyelim */
+  border: 2px solid #ccc;
+  transition: all 0.3s ease-in-out;
   color: #171717;
   margin-left: 5px !important;
 
 }
 
-/* Checkbox işaretlendiğinde renk değişsin */
 .form-check-input:checked {
-  background-color: #9b9b9b; /* Yeşil renk */
+  background-color: #9b9b9b;
 }
 
-
-/* Checkbox işaretlenmeyen durumdaki border rengini değiştirelim */
 .form-check-input:focus {
-  border-color: #5f5f5f; /* Mavi renk */
+  border-color: #5f5f5f; 
   box-shadow: none !important;
 }
 
 .form-check-input:checked {
-  background-color: #757575 !important; /* İşaretli olduğunda kutu rengi (örneğin yeşil) */
+  background-color: #757575 !important; 
   border-color: #757575 !important;
 }
 
-/* Checkbox'ı yuvarlak hale getirelim */
 .form-check-input:checked::before {
-  border-radius: 50%; /* Yuvarlak yapalım */
+  border-radius: 50%; 
 }
 
-/* Etiketin fontunu ve rengini değiştirelim */
 .form-check-label {
   font-size: 16px;
   font-weight: 600;
-  color: #d6d6d6; /* Etiket rengi beyaz */
+  color: #d6d6d6;
   margin-left: 10px;
 }
 
 .card-items {
-  background-color: #282828; /* Yeni arka plan rengi */
-  cursor: pointer; /* Tıklanabilir olduğunu göstermek için */
-  transition: transform 0.2s ease; /* Animasyonlu geçiş */
+  background-color: #282828;
+  cursor: pointer;
+  transition: transform 0.2s ease;
   border-radius: 10px;
-  width: 100%; /* Kartın genişliğini %100 yaparak genişletebilirsiniz */
-
-  margin-right: 55px;  /* Kartlar arasındaki yatay boşluğu artırır */
-
-
+  width: 100%;
+  margin-right: 55px; 
 }
 
 .card-items .card-img-top {
-  width: 100%; /* Görselin genişliği kartın genişliğine göre ayarlanır */
-  height: auto; /* Görselin oranlarını bozmamak için yüksekliği otomatik yapıyoruz */
+  width: 100%;
+  height: auto; 
 }
 .card-items:hover {
-  transform: scale(1.05); /* Hover efektini ekleyin */
+  transform: scale(1.05);
   background-color: #3a3a3a;
 }
 
 .card-items .card-body h5 {
   padding-left: 10px;
-  color: #ffffff; /* Başlık rengi */
-  font-size: 0.9rem; /* Başlık boyutu */
+  color: #ffffff; 
+  font-size: 0.9rem; 
   font-weight: 100;
 }
 
 .card-items .card-body p {
-  color: #ffffff; /* Açıklama rengi */
+  color: #ffffff;
   padding-left: 10px;
   padding-bottom: 10px;
   font-size: 1.2rem;

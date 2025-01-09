@@ -6,15 +6,15 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Home() {
-  const [isSilahTuruOpen, setSilahTuruOpen] = useState(false); // Silah Türü menüsü için state
+  const [isSilahTuruOpen, setSilahTuruOpen] = useState(false);
 
   const toggleSilahTuru = () => {
-    setSilahTuruOpen(prevState => !prevState); // Silah Türü menüsünü aç/kapalı yap
+    setSilahTuruOpen(prevState => !prevState);
   };
 
   return (
     <div className="container-fluid custom-background">
-
+      {/* Navbar */}
       <nav className="navbar navbar-expand-lg navbar-background">
         <div className="container-fluid">
           <Link href="/" className="navbar-brand">
@@ -95,8 +95,6 @@ export default function Home() {
       {/* Filtreleme kutusu */}
       <div className="filter-container">
         <h5>Filtrele</h5>
-
-        {/* Silah Türü Dropdown */}
         <div className="dropdown dropdown-horizontal">
           <button
             className="btn btn-secondary dropdown-toggle"
@@ -104,7 +102,7 @@ export default function Home() {
             id="dropdownSilahTuru"
             data-bs-toggle="dropdown"
             aria-expanded="false"
-            onClick={toggleSilahTuru} // Silah Türü menüsünü tıklandığında aç
+            onClick={toggleSilahTuru}
           >
             Silah Türü
           </button>
@@ -120,7 +118,7 @@ export default function Home() {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    {menuName} {/* Menü ismi burada */}
+                    {menuName}
                   </button>
                   <ul className="dropdown-menu dropdown-menu-right" aria-labelledby={`dropdownExtra${index}`}>
                     <li>
