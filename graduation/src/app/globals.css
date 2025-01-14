@@ -72,11 +72,11 @@ a {
   background-color: #444444 !important;
   color: #c5c5c5 !important; 
   border: 1px solid #c2a061 !important;
+  border-left: none !important;
 }
 
 .search-bar:focus {
-  background-color: #e0e0e0; 
-  border-color: #aaa; 
+  box-shadow: none !important;
 }
 
 .search-icon {
@@ -85,6 +85,7 @@ a {
   padding: 5px; 
   border-radius: 50%; 
   border: 1px solid #c2a061 !important;
+  border-right: none;
 }
 
 /* Filtreleme kutusunun konumu ve stili*/
@@ -92,150 +93,65 @@ a {
   position: fixed;
   top: 100px; 
   left: 12px;
-  width: 230px; 
+  width: 330px; 
   height: 80%;
   padding: 10px;
   background-color: #282828;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 100; 
+  padding: 20px;
 }
 
-.dropdown-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+/* Fiyat belirleme kutucuklarının arka plan rengini değiştirme */
 
-.dropdown {
-  width: 100%;
-}
-
-.dropdown-toggle {
-  width: 100%;
-  padding: 10px;
-  text-align: left;
-}
-
-.dropdown-horizontal {
+.price-range label {
+  color: #ffffff; /* Beyaz renk */
+  font-weight: bold;
+  margin-bottom: 5px;
   margin-top: 20px;
-
 }
 
-.dropdown-menu {
-  display: block;
-  position: relative;
-  width: 100%;
+.price-range input[type="number"] {
+  background-color: #444444; /* Arka plan rengini buradan değiştirebilirsiniz */
+  border: 1px solid;    /* Kenarlık rengi */
+  border-color: #c2a061;
+  border-radius: 5px;        /* Köşe yuvarlama */
+  padding: 10px;             /* İç boşluk */
+  font-size: 16px;           /* Yazı boyutu */
+  color: white;
 }
 
-.extra-dropdowns {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  left: 100%; 
-  top: 0; 
-  margin-left: 10px; 
-  height: 80%;
+.price-range input[type="number"]:focus {
+  background-color: hsl(0, 0%, 39%); /* Fokusa girildiğinde arka plan rengini değiştirme */
+  border-color: hsl(0, 0%, 39%);     /* Fokusa girildiğinde kenarlık rengini değiştirme */
+  box-shadow: none;
 }
 
-/* Silah Türü menüsüne tıklandığında sağa doğru açılacak menüler */
-.extra-dropdowns .dropdown-menu {
-  display: none; 
-  position: absolute;
-  left: 100%; 
-  top: 0; 
-  background-color: #282828;
-  border: 0px;
-  border-radius: 0%;
-  width: 100%;
+
+/* Uygula butonunu özelleştirmek */
+.btn-apply {
+  background-color: #444444; /* Butonun arka plan rengi */
+  border: 1px solid;
+  border-color: #c2a061;     /* Butonun kenarlık rengi */
+  color: white;              /* Butonun yazı rengi (beyaz) */
+  padding: 10px 20px;        /* İç boşluk (üst-alt, sağ-sol) */
+  font-size: 16px;           /* Yazı boyutu */
+  font-weight: bold;         /* Yazı kalınlığı */
+  border-radius: 5px;        /* Köşe yuvarlama */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Geçiş efektleri */
+  margin-top: 30px;
 }
 
-.extra-dropdowns .dropdown-menu .dropdown-item {
-  display: flex;
-  justify-content: flex-end !important; 
-  align-items: center; 
-  padding: 8px 15px;
+/* Butona hover (fare ile üzerine gelindiğinde) efekti eklemek */
+.btn-apply:hover {
+  background-color: #444444(0, 0%, 41%); /* Hover durumunda arka plan rengini koyulaştır */
+  border-color: #c2a061;     /* Hover durumunda kenarlık rengini koyulaştır */
+  transform: scale(1.05);     /* Hover durumunda butonu biraz büyüt */
 }
 
-.extra-dropdowns .dropdown-menu .dropdown-item input[type="checkbox"] {
-  margin-right: 10px; 
-  order: 1; 
-}
 
-.extra-dropdowns .dropdown-menu .dropdown-item span {
-  order: 2; 
-}
 
-.extra-dropdowns .dropdown:hover .dropdown-menu {
-  display: block; 
-}
-
-.dropdown-horizontal .dropdown-toggle {
-  background-color: #282828;
-  color: #fff;
-  border: 0px solid;
-  border-radius: 0%;
-  
-}
-
-.dropdown-horizontal .dropdown-toggle:hover {
-  background-color: #505050; 
-
-}
-
-.dropdown-toggle {
-  width: 200px;
-  padding: 15px 20px;
-  background-color: #282828; 
-  color: #fff; 
-}
-
-.dropdown-toggle:hover {
-  background-color: #505050; 
-
-}
-
-.form-check {
-  margin-bottom: 0;
-  margin-top: 0;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.form-check-input {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ccc;
-  transition: all 0.3s ease-in-out;
-  color: #171717;
-  margin-left: 5px !important;
-
-}
-
-.form-check-input:checked {
-  background-color: #9b9b9b;
-}
-
-.form-check-input:focus {
-  border-color: #5f5f5f; 
-  box-shadow: none !important;
-}
-
-.form-check-input:checked {
-  background-color: #757575 !important; 
-  border-color: #757575 !important;
-}
-
-.form-check-input:checked::before {
-  border-radius: 50%; 
-}
-
-.form-check-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #d6d6d6;
-  margin-left: 10px;
-}
-
+/* Kartlar */
 .card-items {
   background-color: #282828;
   cursor: pointer;
