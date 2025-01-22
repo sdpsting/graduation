@@ -5,6 +5,7 @@ import '../app/globals.css';
 import Link from 'next/link';
 import { useState } from 'react';
 
+
 export default function FilterComponent() {
   const [selectedFilters, setSelectedFilters] = useState({
     searchQuery: '',
@@ -102,9 +103,11 @@ export default function FilterComponent() {
               </div>
             </form>
 
-            <button className="sign-in-button" type="button">
-              Giriş Yap
-            </button>
+            <Link href="/login" passHref>
+                <button className="sign-in-button" type="button">
+                  Giriş Yap
+                </button>
+            </Link>
           </div>
         </div>
       </nav>
