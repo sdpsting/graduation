@@ -3,14 +3,23 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../app/globals.css';
 import Link from 'next/link';
-import { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
 
 export default function FilterComponent() {
   const [selectedFilters, setSelectedFilters] = useState({
     searchQuery: '',
     priceRange: { min: 0, max: 1000 },
   });
+
+  const [user, setUser] = useState<{ name: string } | null>(null);
+
+  useEffect(() => {
+    // Kullanıcı bilgilerini yerel depolamadan al
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFilters((prevState) => ({
@@ -28,6 +37,12 @@ export default function FilterComponent() {
         [type]: value,
       },
     }));
+  };
+
+  const handleLogout = () => {
+    // Kullanıcıyı çıkış yaptır
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   return (
@@ -99,19 +114,28 @@ export default function FilterComponent() {
                   type="search"
                   placeholder="Arama yap"
                   aria-label="Search"
+                  onChange={handleSearchChange}
                 />
               </div>
             </form>
 
-            <Link href="/login" passHref>
-                <button className="sign-in-button" type="button">
+            {user ? (
+              <div className="d-flex align-items-center">
+                <span className="text-white me-2">Hoş geldiniz, {user.name}</span>
+                <button className="btn btn-outline-light" onClick={handleLogout} type="button">
+                  Çıkış Yap
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" passHref>
+                <button className="btn btn-outline-light" type="button">
                   Giriş Yap
                 </button>
-            </Link>
+              </Link>
+            )}
           </div>
         </div>
       </nav>
-
 
       {/* Filtreleme Kutusu */}
       <div className="filter-container">
@@ -119,18 +143,19 @@ export default function FilterComponent() {
 
         {/* Arama Çubuğu */}
         <form className="d-flex me-2">
-        <div className="input-group">
-          <span className="input-group-text search-icon">
-          <i className="bi bi-search"></i>
-          </span>
-          <input
-          className="form-control search-bar"
-          type="search"
-          placeholder="Arama yap"
-          aria-label="Search"
-          />
-        </div>
-      </form>
+          <div className="input-group">
+            <span className="input-group-text search-icon">
+              <i className="bi bi-search"></i>
+            </span>
+            <input
+              className="form-control search-bar"
+              type="search"
+              placeholder="Arama yap"
+              aria-label="Search"
+              onChange={handleSearchChange}
+            />
+          </div>
+        </form>
 
         {/* Fiyat Aralığı */}
         <div className="price-range mt-3">
@@ -161,19 +186,20 @@ export default function FilterComponent() {
 
         {/* Filtre Uygula */}
         <button className="btn-apply" type="button">
-        Uygula
-      </button>
+          Uygula
+        </button>
       </div>
-
-
 
       {/* Kartlar */}
       <div className="container mt-4">
         <div className="row">
-          {/* Kartları 6x3 düzeninde ekliyoruz */}
           {Array.from({ length: 18 }).map((_, index) => (
-            <div className="col-6 col-md-4 col-lg-2 mb-4" key={index} >
-              <div className="card-items" style={{ cursor: "pointer" }} onClick={() => alert(`Kart ${index + 1} tıklandı`)}>
+            <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
+              <div
+                className="card-items"
+                style={{ cursor: 'pointer' }}
+                onClick={() => alert(`Kart ${index + 1} tıklandı`)}
+              >
                 <img
                   src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2v_Nfz5H_uO1gb-Gw_alIITBhGJf_NZlmOzA-LP4jVC9vh5yYmGhJIKRdVA_NF6C-AC2yOjngJXu6MiaznU3v3Un7X-Iy0e1iEoeP_sv26JaEqwbxg/360fx360f"
                   className="card-img-top"
