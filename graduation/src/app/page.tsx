@@ -3,12 +3,14 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // next/navigation kullanımı
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 type Item = {
   name: string;
   image: string;
+  wears: string;
+  price: number; // Price alanı eklendi
 };
 
 export default function FilterComponent() {
@@ -19,8 +21,10 @@ export default function FilterComponent() {
 
   const [user, setUser] = useState<{ name: string } | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]); // Filtrelenmiş ürünler için yeni state
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Router burada next/navigation'dan geliyor
+  const [modalContent, setModalContent] = useState<Item | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -32,7 +36,17 @@ export default function FilterComponent() {
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data)) {
-          setItems(data);
+          const processedItems = data.map(item => {
+            const wearsArray: string[] = item.wears.split(',').map((wear: string) => wear.trim());
+            const randomWear = wearsArray[Math.floor(Math.random() * wearsArray.length)];
+            return {
+              ...item,
+              wears: randomWear,
+              price: item.price, // Price bilgisi eklendi
+            };
+          });
+          setItems(processedItems);
+          setFilteredItems(processedItems); // Başlangıçta tüm ürünleri göster
           setError(null);
         } else {
           console.error('Beklenmeyen veri formatı:', data);
@@ -65,18 +79,31 @@ export default function FilterComponent() {
     }));
   };
 
+  const applyFilters = () => {
+    const { min, max } = selectedFilters.priceRange;
+    const filtered = items.filter(item => item.price >= min && item.price <= max);
+    setFilteredItems(filtered);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     setUser(null);
   };
 
   const handleBalanceClick = () => {
-    router.push('/payment'); // Ödeme sayfasına yönlendirme
+    router.push('/payment');
   };
 
   const handleProfileClick = () => {
-    // Profil sayfasına yönlendir
     router.push('/profile');
+  };
+
+  const handleCardClick = (item: Item) => {
+    setModalContent(item);
+  };
+
+  const closeModal = () => {
+    setModalContent(null);
   };
 
   return (
@@ -143,6 +170,7 @@ export default function FilterComponent() {
                   type="search"
                   placeholder="Arama yap"
                   aria-label="Search"
+                  onChange={handleSearchChange}
                 />
               </div>
             </form>
@@ -150,7 +178,6 @@ export default function FilterComponent() {
             {user ? (
               <div className="d-flex align-items-center">
                 <span className="text-white me-2">Hoş geldiniz, {user.name}</span>
-                {/* Bakiye Dikdörtgeni */}
                 <div
                   className="balance-container d-flex flex-column justify-content-center align-items-center"
                   onClick={handleBalanceClick}
@@ -159,7 +186,6 @@ export default function FilterComponent() {
                   <span className="balance-amount">$1000</span>
                 </div>
 
-                {/* Profil Logosu */}
                 <div
                   className="account-logo"
                   style={{ cursor: 'pointer', marginRight: '10px' }}
@@ -171,7 +197,7 @@ export default function FilterComponent() {
                     style={{ width: '40px', height: 'auto', borderRadius: '50%' }}
                   />
                 </div>
-                <button className="btn btn-outline-light" type="button">
+                <button className="btn btn-outline-light" onClick={handleLogout} type="button">
                   Çıkış Yap
                 </button>
               </div>
@@ -213,7 +239,7 @@ export default function FilterComponent() {
           </div>
         </div>
 
-        <button className="btn-apply" type="button">
+        <button className="btn-apply" type="button" onClick={applyFilters}>
           Uygula
         </button>
       </div>
@@ -223,32 +249,64 @@ export default function FilterComponent() {
 
       <div className="container mt-4">
         <div className="row">
-          {items.map((item, index) => {
-            const searchUrl = `https://steamcommunity.com/market/search?appid=730&q=${encodeURIComponent(item.name)}`;
-            return (
-              <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
-                <div
-                  className="card-items"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => alert(`Kart ${index + 1} tıklandı`)}
-                >
-                  <img
-                    src={item.image}
-                    className="card-img-top"
-                    alt={`Card image ${index + 1}`}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{item.name}</h5>
-                    <a href={searchUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                      Steam Market'te Ara
-                    </a>
-                  </div>
+          {filteredItems.map((item, index) => (
+            <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
+              <div
+                className="card-items"
+                style={{ cursor: 'pointer' }}
+                onClick={() => handleCardClick(item)}
+              >
+                <img
+                  src={item.image}
+                  className="card-img-top"
+                  alt={`Card image ${index + 1}`}
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{item.name}</h5>
+                  <p className="card-text" style={{ fontWeight: 'bold', color: '#555' }}>
+                    {item.wears}
+                  </p>
+                  <p className="card-text" style={{ fontWeight: 'bold', color: 'white' }}>
+                    Fiyat: ${item.price} {/* Fiyat bilgisi gösteriliyor */}
+                  </p>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* Modal */}
+      {modalContent && (
+        <div className="modal show d-block" tabIndex={-1} role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog" role="document">
+            <div className="modal-content" style={{ backgroundColor: '#333', color: 'white' }}>
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {modalContent.name} <span style={{ fontWeight: 'bold', color: '#ccc' }}>({modalContent.wears})</span>
+                </h5>
+              </div>
+              <div className="modal-body text-center">
+                <img src={modalContent.image} alt={modalContent.name} className="img-fluid" />
+                <p style={{ fontWeight: 'bold', color: 'white' }}>Fiyat: ${modalContent.price}</p> {/* Fiyat bilgisi eklendi ve rengi beyaz yapıldı */}
+                <a
+                  href={`https://steamcommunity.com/market/search?appid=730&q=${encodeURIComponent(modalContent.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary mt-3"
+                >
+                  Steam Market'te Ara
+                </a>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                  Kapat
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

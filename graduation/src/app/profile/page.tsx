@@ -2,24 +2,22 @@
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // next/navigation kullanımı
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-
-type Item = {
-  name: string;
-  image: string;
-};
 
 export default function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState<'profile' | 'payment'>('profile');
-  const [user, setUser] = useState<{ name: string } | null>(null);
+  const [user, setUser] = useState<{ id: string; name: string; email: string; password: string } | null>(null);
+  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
-  const router = useRouter(); // Router burada next/navigation'dan geliyor
+  const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setFormData({ name: parsedUser.name, email: parsedUser.email, password: '' });
     }
   }, []);
 
@@ -28,11 +26,45 @@ export default function ProfilePage() {
   };
 
   const handleBalanceClick = () => {
-    router.push('/payment'); // Ödeme sayfasına yönlendirme
+    router.push('/payment');
   };
 
   const handleTabChange = (tab: 'profile' | 'payment') => {
     setSelectedTab(tab);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        alert('Bilgiler başarıyla güncellendi!');
+      } else {
+        alert('Bilgiler güncellenirken bir hata oluştu.');
+      }
+    } catch (error) {
+      console.error('Güncelleme hatası:', error);
+      alert('Bilgiler güncellenirken bir hata oluştu.');
+    }
   };
 
   return (
@@ -106,7 +138,6 @@ export default function ProfilePage() {
             {user ? (
               <div className="d-flex align-items-center">
                 <span className="text-white me-2">Hoş geldiniz, {user.name}</span>
-                {/* Bakiye Dikdörtgeni */}
                 <div
                   className="balance-container d-flex flex-column justify-content-center align-items-center"
                   onClick={handleBalanceClick}
@@ -115,7 +146,6 @@ export default function ProfilePage() {
                   <span className="balance-amount">$1000</span>
                 </div>
 
-                {/* Profil Logosu */}
                 <div
                   className="account-logo"
                   style={{ cursor: 'pointer', marginRight: '10px' }}
@@ -144,7 +174,6 @@ export default function ProfilePage() {
 
       {/* Ana İçerik */}
       <div className="row mt-4">
-        {/* Sol Kutucuk */}
         <div className="col-md-4 d-flex flex-column align-items-center">
           <div className="profile-box">
             <img
@@ -156,7 +185,6 @@ export default function ProfilePage() {
               <button
                 className={`tab-button ${selectedTab === 'profile' ? 'active' : ''}`}
                 onClick={() => handleTabChange('profile')}
-
               >
                 Profil
               </button>
@@ -170,13 +198,44 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Sağ Kutucuk */}
         <div className="col-md-8">
           <div className={`content-box ${selectedTab === 'profile' ? 'profile-tab' : 'content-tab'}`}>
             {selectedTab === 'profile' ? (
               <div className="profile-content text-white">
                 <h3>Profil Bilgileri</h3>
-                <p>Burada profil bilgileri yer alacak...</p>
+                <div className="form-group">
+                  <label>Kullanıcı Adı Değiştirme</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group mt-3">
+                  <label>E-posta Değiştirme</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="form-group mt-3">
+                  <label>Şifre Değiştirme</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <button className="btn btn-primary mt-4" onClick={handleSubmit}>
+                  Güncelle
+                </button>
               </div>
             ) : (
               <div className="payment-content text-white">

@@ -193,9 +193,6 @@ export default function FAQComponent() {
           <div className="faq-menu">
             <div className="menu-section mb-4">
               <div className="menu-item text-white-50 mb-2">
-                1.1 BUFF Market ve BUFF163 arasındaki ilişki
-              </div>
-              <div className="menu-item text-white-50 mb-2">
                 1. Sitemde nasıl işlem yapabilirim?
               </div>
               <div className="menu-item text-white-50 mb-2">
