@@ -205,24 +205,30 @@ export default function FilterComponent() {
       {/* Kartlar */}
       <div className="container mt-4">
         <div className="row">
-          {items.map((item, index) => (
-            <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
-              <div
-                className="card-items"
-                style={{ cursor: 'pointer' }}
-                onClick={() => alert(`Kart ${index + 1} tıklandı`)}
-              >
-                <img
-                  src={item.image}
-                  className="card-img-top"
-                  alt={`Card image ${index + 1}`}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{item.name}</h5>
+          {items.map((item, index) => {
+            const searchUrl = `https://steamcommunity.com/market/search?appid=730&q=${encodeURIComponent(item.name)}`;
+            return (
+              <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
+                <div
+                  className="card-items"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => alert(`Kart ${index + 1} tıklandı`)}
+                >
+                  <img
+                    src={item.image}
+                    className="card-img-top"
+                    alt={`Card image ${index + 1}`}
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title">{item.name}</h5>
+                    <a href={searchUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                      Steam Market'te Ara
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
