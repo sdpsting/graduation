@@ -42,7 +42,7 @@ a {
 }
 
 .custom-background {
-  background-color: #202020;
+  background-color: hsl(0, 0%, 10%);
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -219,4 +219,178 @@ a {
   font-weight: 600;
   font-size: large;
   text-decoration: underline;
+}
+
+.balance-container {
+  cursor: pointer;
+  padding: 0px 20px; /* Yastık (padding) */
+  border-radius: 3px; /* Kenar yuvarlama */
+  margin-right: 10px;
+  background-color: #444444; /* Açık mavi arka plan */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hafif gölge */
+  transition: all 0.3s ease; /* Geçiş efekti */
+}
+
+.balance-container:hover {
+  background-color: hsl(0, 0%, 33%); /* Hover efekti: kutu büyür */
+}
+
+.balance-container .balance-label {
+  font-size: 14px; /* Bakiye etiketi */
+  color: hsl(0, 0%, 100%); /* Etiket rengi */
+}
+
+.balance-container .balance-amount {
+  font-size: 20px; /* Bakiye miktarı */
+  font-weight: 400;
+  color: #c2a061; /* Bakiye rengi */
+}
+
+.balance-container .balance-label,
+.balance-container .balance-amount {
+  text-align: center;
+  display: block;
+}
+
+/* Profil sayfası */
+
+/* Profil ve Ödeme Tabları */
+.profile-box {
+  width: 50%;
+  background-color: #282828;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  margin-left: 300px;
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.tab-button {
+  width: 114%;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #282828;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.tab-button.active {
+  background-color: #c2a061;
+  color: white;
+}
+
+/* İçerik Kutusu */
+.content-box {
+  width: 60%;
+  background-color: #282828;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 300px;
+  margin-left: 0px;
+}
+
+.profile-content, .payment-content {
+  font-size: 18px;
+}
+
+.profile-content h3, .payment-content h3 {
+  color: white;
+}
+
+.faq-container {
+  min-height: calc(100vh - 80px);
+}
+
+.faq-sidebar {
+  border-right: 1px solid #333;
+}
+
+.menu-item {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.menu-item:hover {
+  background-color: #333;
+}
+
+.faq-content {
+  color: #fff;
+}
+
+.content-section {
+  max-width: 800px;
+}
+
+/*SSS*/
+
+.faq-container {
+  min-height: calc(100vh - 80px);
+}
+
+.faq-sidebar {
+  width: 300px;
+  background-color: #2a2a2a;
+  padding: 20px;
+  margin-left: 300px;
+  margin-right: 10px;
+  border-radius: 5px;
+}
+
+.faq-menu {
+  margin-bottom: 20px;
+}
+
+.menu-section {
+  margin-bottom: 1.5rem;
+}
+
+.menu-item {
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+.menu-item:hover {
+  background-color: #333;
+}
+
+.faq-content {
+  flex: 1;
+  background-color: #2a2a2a;
+  padding: 30px;
+  color: #fff;
+  margin-right: 300px;
+}
+
+.content-section {
+  max-width: 800px;
+  margin-bottom: 3rem;
+}
+
+.content-section h2 {
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+.content-section p {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.faq-sidebar h3 {
+  color: white;
+  margin-bottom: 1rem;
 }

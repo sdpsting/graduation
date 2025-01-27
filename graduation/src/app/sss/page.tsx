@@ -1,7 +1,6 @@
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './globals.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // next/navigation kullanımı
 import React, { useState, useEffect } from 'react';
@@ -11,7 +10,7 @@ type Item = {
   image: string;
 };
 
-export default function FilterComponent() {
+export default function FAQComponent() {
   const [selectedFilters, setSelectedFilters] = useState({
     searchQuery: '',
     priceRange: { min: 0, max: 1000 },
@@ -186,67 +185,103 @@ export default function FilterComponent() {
         </div>
       </nav>
 
-      {/* Filtreleme Kutusu */}
-      <div className="filter-container text-white">
-        <h5>Filtrele</h5>
-        <div className="price-range mt-3">
-          <label>Fiyat Aralığı</label>
-          <div className="d-flex justify-content-between">
-            <input
-              type="number"
-              className="form-control"
-              min="0"
-              max="10000"
-              value={selectedFilters.priceRange.min}
-              onChange={(e) => handlePriceRangeChange(e, 'min')}
-              style={{ width: '48%' }}
-            />
-            <input
-              type="number"
-              className="form-control"
-              min="0"
-              max="10000"
-              value={selectedFilters.priceRange.max}
-              onChange={(e) => handlePriceRangeChange(e, 'max')}
-              style={{ width: '48%' }}
-            />
+      <div className="faq-container d-flex mt-4">
+        {/* Sol menü */}
+        <div className="faq-sidebar">
+          <h3 className="text-white mb-4">BUFF.Market & BUFF163</h3>
+          
+          <div className="faq-menu">
+            <div className="menu-section mb-4">
+              <div className="menu-item text-white-50 mb-2">
+                1.1 BUFF Market ve BUFF163 arasındaki ilişki
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                1. Sitemde nasıl işlem yapabilirim?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                2. Eşyalarımı nasıl satabilirim?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                3. Eşyaların fiyatları nasıl belirleniyor?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                4. Ödemeyi nasıl yapabilirim?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                5. Eşyalarımı nasıl alabilirim?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                6. Satın aldığım eşyalar ne zaman hesabıma gelir?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                7. Hesabımda sorun yaşarsam ne yapmalıyım?
+              </div>
+              <div className="menu-item text-white-50 mb-2">
+                8. Sitemiz ne kadar güvenli?
+              </div>
+            </div>
           </div>
         </div>
 
-        <button className="btn-apply" type="button">
-          Uygula
-        </button>
-      </div>
+        {/* Sağ içerik alanı */}
+        <div className="faq-content">
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">1. Sitemde nasıl işlem yapabilirim?</h2>
+            <p className="text-white-50">
+                Sitemize üye olduktan sonra, Counter Strike 2 eşyalarınızı satın alabilir veya satabilirsiniz. Satış yapmak için, envanterinizden eşya seçerek satışa çıkartabilir, satın almak için istediğiniz eşyayı sepete ekleyerek ödeme işlemini tamamlayabilirsiniz.
+            </p>
+          </div>
 
-      {/* İtemlar */}
-      {error && <p className="text-danger text-center mt-4">{error}</p>}
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">2. Eşyalarımı nasıl satabilirim?</h2>
+            <p className="text-white-50">
+                Eşyalarınızı satabilmek için, öncelikle sitemize üye olmanız gerekmektedir. Üyeliğinizi oluşturduktan sonra, envanterinizden satmak istediğiniz eşyayı seçin, fiyat belirleyin ve satışa sunun. Satış işlemi tamamlandığında, kazancınız hesabınıza aktarılacaktır.
+            </p>
+          </div>
 
-      <div className="container mt-4">
-        <div className="row">
-          {items.map((item, index) => {
-            const searchUrl = `https://steamcommunity.com/market/search?appid=730&q=${encodeURIComponent(item.name)}`;
-            return (
-              <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
-                <div
-                  className="card-items"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => alert(`Kart ${index + 1} tıklandı`)}
-                >
-                  <img
-                    src={item.image}
-                    className="card-img-top"
-                    alt={`Card image ${index + 1}`}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{item.name}</h5>
-                    <a href={searchUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                      Steam Market'te Ara
-                    </a>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">3. Eşyaların fiyatları nasıl belirleniyor?</h2>
+            <p className="text-white-50">
+                Eşyaların fiyatları, piyasa talebine ve sitemizdeki mevcut satış fiyatlarına göre belirlenir. Kullanıcılar, eşyalarını istedikleri fiyatla satışa çıkarabilir, ancak sitemiz, aşırı yüksek veya düşük fiyatları engellemek için belirli bir aralıkta fiyat düzenlemesi yapabilir.
+            </p>
+          </div>
+
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">4. Ödemeyi nasıl yapabilirim?</h2>
+            <p className="text-white-50">
+                Ödemeler, kredi kartı, banka transferi veya sitemizdeki diğer ödeme yöntemleriyle yapılabilir. Ödeme işlemi, güvenli ödeme altyapımız aracılığıyla gerçekleşir ve bilgilerinizin güvenliği sağlanır.
+            </p>
+          </div>
+
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">5. Eşyalarımı nasıl alabilirim?</h2>
+            <p className="text-white-50">
+                Eşyaları almak için, sitemizdeki mağaza sekmesinden veya kullanıcılar tarafından satılan eşyalardan seçim yapabilirsiniz. Beğendiğiniz eşyayı sepete ekleyip ödeme işlemini tamamladıktan sonra, eşya hesabınıza aktarılır.
+            </p>
+          </div>
+
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">6. Satın aldığım eşyalar ne zaman hesabıma gelir?</h2>
+            <p className="text-white-50">
+                Satın alma işlemi tamamlandıktan sonra, eşyalarınız genellikle 15 dakika içinde hesabınıza aktarılır. Ancak, bazı durumlarda işlemlerin tamamlanması birkaç dakika sürebilir.
+            </p>
+          </div>
+
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">7. Hesabımda sorun yaşarsam ne yapmalıyım?</h2>
+            <p className="text-white-50">
+                Herhangi bir sorunla karşılaştığınızda, destek ekibimizle iletişime geçebilirsiniz. İletişim bilgilerimiz sitemizin "İletişim" sekmesinde yer almaktadır.
+            </p>
+          </div>
+
+          <div className="content-section mb-5">
+            <h2 className="text-white mb-4">8. Sitemiz ne kadar güvenli?</h2>
+            <p className="text-white-50">
+                Sitemiz, kullanıcı güvenliğini ön planda tutarak gelişmiş şifreleme ve güvenlik önlemleri kullanmaktadır. Ödemeler, güvenli ödeme altyapılarımızla yapılır ve kişisel bilgileriniz korunur.
+            </p>
+          </div>
+          
+          
         </div>
       </div>
     </div>

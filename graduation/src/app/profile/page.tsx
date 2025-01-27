@@ -1,7 +1,6 @@
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './globals.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // next/navigation kullanımı
 import React, { useState, useEffect } from 'react';
@@ -11,15 +10,10 @@ type Item = {
   image: string;
 };
 
-export default function FilterComponent() {
-  const [selectedFilters, setSelectedFilters] = useState({
-    searchQuery: '',
-    priceRange: { min: 0, max: 1000 },
-  });
-
+export default function ProfilePage() {
+  const [selectedTab, setSelectedTab] = useState<'profile' | 'payment'>('profile');
   const [user, setUser] = useState<{ name: string } | null>(null);
-  const [items, setItems] = useState<Item[]>([]);
-  const [error, setError] = useState<string | null>(null);
+
   const router = useRouter(); // Router burada next/navigation'dan geliyor
 
   useEffect(() => {
@@ -27,56 +21,18 @@ export default function FilterComponent() {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-
-    fetch('/api/items')
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setItems(data);
-          setError(null);
-        } else {
-          console.error('Beklenmeyen veri formatı:', data);
-          setError('Beklenmeyen veri formatı');
-          setItems([]);
-        }
-      })
-      .catch((error) => {
-        console.error('Veri çekme hatası:', error);
-        setError('Veri çekme hatası');
-        setItems([]);
-      });
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedFilters((prevState) => ({
-      ...prevState,
-      searchQuery: e.target.value,
-    }));
-  };
-
-  const handlePriceRangeChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
-    const value = Number(e.target.value);
-    setSelectedFilters((prevState) => ({
-      ...prevState,
-      priceRange: {
-        ...prevState.priceRange,
-        [type]: value,
-      },
-    }));
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
+  const handleProfileClick = () => {
+    router.push('/profile');
   };
 
   const handleBalanceClick = () => {
     router.push('/payment'); // Ödeme sayfasına yönlendirme
   };
 
-  const handleProfileClick = () => {
-    // Profil sayfasına yönlendir
-    router.push('/profile');
+  const handleTabChange = (tab: 'profile' | 'payment') => {
+    setSelectedTab(tab);
   };
 
   return (
@@ -186,67 +142,49 @@ export default function FilterComponent() {
         </div>
       </nav>
 
-      {/* Filtreleme Kutusu */}
-      <div className="filter-container text-white">
-        <h5>Filtrele</h5>
-        <div className="price-range mt-3">
-          <label>Fiyat Aralığı</label>
-          <div className="d-flex justify-content-between">
-            <input
-              type="number"
-              className="form-control"
-              min="0"
-              max="10000"
-              value={selectedFilters.priceRange.min}
-              onChange={(e) => handlePriceRangeChange(e, 'min')}
-              style={{ width: '48%' }}
+      {/* Ana İçerik */}
+      <div className="row mt-4">
+        {/* Sol Kutucuk */}
+        <div className="col-md-4 d-flex flex-column align-items-center">
+          <div className="profile-box">
+            <img
+              src="https://w7.pngwing.com/pngs/215/58/png-transparent-computer-icons-google-account-scalable-graphics-computer-file-my-account-icon-rim-123rf-symbol-thumbnail.png"
+              alt="Profile"
+              className="profile-image"
             />
-            <input
-              type="number"
-              className="form-control"
-              min="0"
-              max="10000"
-              value={selectedFilters.priceRange.max}
-              onChange={(e) => handlePriceRangeChange(e, 'max')}
-              style={{ width: '48%' }}
-            />
+            <div className="d-flex flex-column align-items-center mt-3">
+              <button
+                className={`tab-button ${selectedTab === 'profile' ? 'active' : ''}`}
+                onClick={() => handleTabChange('profile')}
+
+              >
+                Profil
+              </button>
+              <button
+                className={`tab-button ${selectedTab === 'payment' ? 'active' : ''}`}
+                onClick={() => handleTabChange('payment')}
+              >
+                Ödeme
+              </button>
+            </div>
           </div>
         </div>
 
-        <button className="btn-apply" type="button">
-          Uygula
-        </button>
-      </div>
-
-      {/* İtemlar */}
-      {error && <p className="text-danger text-center mt-4">{error}</p>}
-
-      <div className="container mt-4">
-        <div className="row">
-          {items.map((item, index) => {
-            const searchUrl = `https://steamcommunity.com/market/search?appid=730&q=${encodeURIComponent(item.name)}`;
-            return (
-              <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
-                <div
-                  className="card-items"
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => alert(`Kart ${index + 1} tıklandı`)}
-                >
-                  <img
-                    src={item.image}
-                    className="card-img-top"
-                    alt={`Card image ${index + 1}`}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{item.name}</h5>
-                    <a href={searchUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-                      Steam Market'te Ara
-                    </a>
-                  </div>
-                </div>
+        {/* Sağ Kutucuk */}
+        <div className="col-md-8">
+          <div className={`content-box ${selectedTab === 'profile' ? 'profile-tab' : 'content-tab'}`}>
+            {selectedTab === 'profile' ? (
+              <div className="profile-content text-white">
+                <h3>Profil Bilgileri</h3>
+                <p>Burada profil bilgileri yer alacak...</p>
               </div>
-            );
-          })}
+            ) : (
+              <div className="payment-content text-white">
+                <h3>Ödeme Sayfası</h3>
+                <p>Burada ödeme işlemleri yapılacak...</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
