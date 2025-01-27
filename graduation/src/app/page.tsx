@@ -1,9 +1,14 @@
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../app/globals.css';
+import './globals.css';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
+
+type Item = {
+  name: string;
+  image: string;
+};
 
 export default function FilterComponent() {
   const [selectedFilters, setSelectedFilters] = useState({
@@ -12,6 +17,7 @@ export default function FilterComponent() {
   });
 
   const [user, setUser] = useState<{ name: string } | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
     // Kullanıcı bilgilerini yerel depolamadan al
@@ -19,6 +25,12 @@ export default function FilterComponent() {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    // Veritabanından verileri çek
+    fetch('/api/items')
+      .then((response) => response.json())
+      .then((data) => setItems(data))
+      .catch((error) => console.error('Veri çekme hatası:', error));
   }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +57,6 @@ export default function FilterComponent() {
     setUser(null);
   };
 
-  
   return (
     <div className="container-fluid custom-background">
       {/* Navbar */}
@@ -194,7 +205,7 @@ export default function FilterComponent() {
       {/* Kartlar */}
       <div className="container mt-4">
         <div className="row">
-          {Array.from({ length: 18 }).map((_, index) => (
+          {items.map((item, index) => (
             <div className="col-6 col-md-4 col-lg-2 mb-4" key={index}>
               <div
                 className="card-items"
@@ -202,13 +213,12 @@ export default function FilterComponent() {
                 onClick={() => alert(`Kart ${index + 1} tıklandı`)}
               >
                 <img
-                  src="https://community.cloudflare.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2v_Nfz5H_uO1gb-Gw_alIITBhGJf_NZlmOzA-LP4jVC9vh5yYmGhJIKRdVA_NF6C-AC2yOjngJXu6MiaznU3v3Un7X-Iy0e1iEoeP_sv26JaEqwbxg/360fx360f"
+                  src={item.image}
                   className="card-img-top"
                   alt={`Card image ${index + 1}`}
                 />
                 <div className="card-body">
-                  <h5 className="card-title">M4A1-S | Printstream</h5>
-                  <p className="card-text">$ 634.59</p>
+                  <h5 className="card-title">{item.name}</h5>
                 </div>
               </div>
             </div>
