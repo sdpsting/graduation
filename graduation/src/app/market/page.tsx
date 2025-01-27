@@ -1,7 +1,6 @@
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '../app/globals.css';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
@@ -45,7 +44,6 @@ export default function FilterComponent() {
     setUser(null);
   };
 
-  
   return (
     <div className="container-fluid custom-background">
       {/* Navbar */}
@@ -74,7 +72,7 @@ export default function FilterComponent() {
           <div className="collapse navbar-collapse" id="navbarContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link href="/market" className="nav-link active text-white">
+                <Link href="#" className="nav-link active text-white">
                   Market
                 </Link>
               </li>
