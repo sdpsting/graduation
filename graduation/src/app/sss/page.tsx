@@ -188,7 +188,7 @@ export default function FAQComponent() {
       <div className="faq-container d-flex mt-4">
         {/* Sol menü */}
         <div className="faq-sidebar">
-          <h3 className="text-white mb-4">BUFF.Market & BUFF163</h3>
+          <h3 className="text-white mb-4">Sıkça Sorulan Sorular</h3>
           
           <div className="faq-menu">
             <div className="menu-section mb-4">
