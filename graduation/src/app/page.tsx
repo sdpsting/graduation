@@ -144,7 +144,7 @@ export default function FilterComponent() {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link href="/sell" className="nav-link text-white">
+                <Link href="/banner" className="nav-link text-white">
                   Eşya Sat
                 </Link>
               </li>
