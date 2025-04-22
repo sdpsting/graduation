@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';  // Add this to use Link in the navbar
+import Navbar from 'src/app/components/navbar'; // Navbar bileşeni eklendi
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -59,6 +60,7 @@ export default function RegisterPage() {
 
   return (
     <div>
+      <Navbar />
       {/* Register Page Content */}
       <div className="d-flex flex-column justify-content-center align-items-center vh-100 custom-login-background">
         <div className="p-4 shadow custom-login-card" style={{ maxWidth: '400px', width: '100%' }}>
