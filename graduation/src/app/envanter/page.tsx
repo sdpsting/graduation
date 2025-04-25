@@ -9,6 +9,8 @@ type InventoryItem = {
   name: string;
   icon_url: string;
   market_hash_name: string;
+  tradable: number;  // Takaslanabilirlik bilgisi
+  selected?: boolean; // Seçilen eşya durumu
 };
 
 export default function InventoryPage() {
@@ -28,13 +30,18 @@ export default function InventoryPage() {
           return;
         }
 
-        const descriptions = data.descriptions.map((item: any) => ({
-          name: item.name,
-          icon_url: item.icon_url,
-          market_hash_name: item.market_hash_name,
-        }));
+        // Yalnızca takaslanabilir eşyaları filtreleyelim
+        const tradableItems = data.descriptions
+          .filter((item: any) => item.tradable === 1)  // Takaslanabilir olanları seçiyoruz
+          .map((item: any) => ({
+            name: item.name,
+            icon_url: item.icon_url,
+            market_hash_name: item.market_hash_name,
+            tradable: item.tradable,
+            selected: false, // Başlangıçta hiçbiri seçili değil
+          }));
 
-        setItems(descriptions);
+        setItems(tradableItems);
         setError(null);
       })
       .catch(() => setError('Envanter çekilirken hata oluştu.'))
@@ -42,9 +49,29 @@ export default function InventoryPage() {
   }, []);
 
   const handleSelectItem = (item: InventoryItem) => {
+    // Eğer eşyayı daha önce seçmediysek, sol tarafta seçili yapıyoruz
     if (!selectedItems.find(i => i.market_hash_name === item.market_hash_name)) {
       setSelectedItems([...selectedItems, item]);
+
+      // Aynı zamanda sol tarafta ilgili öğeyi de seçili yapıyoruz
+      setItems(prevItems =>
+        prevItems.map(i =>
+          i.market_hash_name === item.market_hash_name ? { ...i, selected: true } : i
+        )
+      );
     }
+  };
+
+  const handleRemoveItem = (item: InventoryItem) => {
+    // Sağ taraftan silindiğinde, sol taraftaki eşyanın solukluğunu kaldırıyoruz
+    setSelectedItems(selectedItems.filter(i => i.market_hash_name !== item.market_hash_name));
+
+    // Aynı zamanda, sol tarafta ilgili öğeyi de seçili olmaktan çıkarıyoruz
+    setItems(prevItems =>
+      prevItems.map(i =>
+        i.market_hash_name === item.market_hash_name ? { ...i, selected: false } : i
+      )
+    );
   };
 
   const handleSellClick = () => {
@@ -52,6 +79,28 @@ export default function InventoryPage() {
       // Satış işlemi burada gerçekleşecek
       alert(`${selectedItems.length} eşya satıldı!`);
       setSelectedItems([]);
+      // Eşyaları sattıktan sonra tüm seçimleri sıfırlıyoruz
+      setItems(prevItems =>
+        prevItems.map(i => ({ ...i, selected: false }))
+      );
+    }
+  };
+
+  const handleItemClick = (item: InventoryItem) => {
+    // Sol taraftaki item'a tıklandığında, seçili olup olmadığını kontrol ediyoruz
+    setItems(prevState =>
+      prevState.map(i =>
+        i.market_hash_name === item.market_hash_name
+          ? { ...i, selected: !i.selected } // Seçiliyse, seçimi kaldırıyoruz
+          : i
+      )
+    );
+
+    // Seçili eşyayı sağ taraftaki seçili listesine ekliyoruz
+    if (!selectedItems.find(i => i.market_hash_name === item.market_hash_name)) {
+      setSelectedItems([...selectedItems, item]);
+    } else {
+      setSelectedItems(selectedItems.filter(i => i.market_hash_name !== item.market_hash_name));
     }
   };
 
@@ -68,24 +117,37 @@ export default function InventoryPage() {
           {error && <p className="text-danger">{error}</p>}
 
           <div className="row">
-            {items.map((item, index) => (
-              <div className="col-6 col-md-4 col-lg-3 mb-4" key={index}>
-                <div className="card-items" style={{ backgroundColor: '#222', borderRadius: '8px', padding: '10px' }}>
-                  <img
-                    src={`https://community.cloudflare.steamstatic.com/economy/image/${item.icon_url}`}
-                    alt={item.name}
-                    className="img-fluid"
-                  />
-                  <h6 className="mt-2 text-white" style={{ fontSize: '0.9rem' }}>{item.name}</h6>
-                  <button
-                    className="btn btn-sm btn-warning mt-2"
-                    onClick={() => handleSelectItem(item)}
+            {items.length === 0 ? (
+              <p>Takaslanabilir eşya bulunamadı.</p>
+            ) : (
+              items.map((item, index) => (
+                <div className="col-6 col-md-4 col-lg-3 mb-4" key={index}>
+                  <div
+                    className="card-items"
+                    style={{
+                      backgroundColor: '#222',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      opacity: item.selected ? 0.5 : 1, // Seçili eşyanın soluklaştırılması
+                    }}
+                    onClick={() => handleItemClick(item)}
                   >
-                    Sat
-                  </button>
+                    <img
+                      src={`https://community.cloudflare.steamstatic.com/economy/image/${item.icon_url}`}
+                      alt={item.name}
+                      className="img-fluid"
+                    />
+                    <h6 className="mt-2 text-white" style={{ fontSize: '0.9rem' }}>{item.name}</h6>
+                    <button
+                      className="btn btn-sm btn-warning mt-2"
+                      onClick={() => handleSelectItem(item)}
+                    >
+                      Sat
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -100,7 +162,7 @@ export default function InventoryPage() {
 
             <div className="mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
               {selectedItems.map((item, index) => (
-                <div key={index} className="d-flex align-items-center mb-2">
+                <div key={index} className="d-flex align-items-center mb-2" style={{ backgroundColor: '#333', padding: '10px', borderRadius: '8px', marginBottom: '10px' }}>
                   <img
                     src={`https://community.cloudflare.steamstatic.com/economy/image/${item.icon_url}`}
                     alt={item.name}
@@ -108,6 +170,12 @@ export default function InventoryPage() {
                     className="me-2"
                   />
                   <span className="text-white" style={{ fontSize: '0.9rem' }}>{item.name}</span>
+                  <button
+                    className="btn btn-sm btn-danger ms-auto"
+                    onClick={() => handleRemoveItem(item)}
+                  >
+                    <i className="bi bi-trash"></i> {/* Çöp kutusu ikonu */}
+                  </button>
                 </div>
               ))}
             </div>
