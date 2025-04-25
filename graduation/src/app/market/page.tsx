@@ -189,13 +189,14 @@ export default function FilterComponent() {
                 <img src={modalContent.image} alt={modalContent.name} className="img-fluid" />
                 <p style={{ fontWeight: 'bold', color: 'white' }}>Fiyat: ${modalContent.price}</p>
                 <a
-                  href={`https://steamcommunity.com/market/search?appid=730&q=${encodeURIComponent(modalContent.name)}`}
-                  target="_blank"
+                   href={`https://steamcommunity.com/market/listings/730/${encodeURIComponent(`${modalContent.name} (${modalContent.wears})`)}`}
+                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-primary mt-3"
-                >
-                  Steam Market'te Ara
-                </a>
+                  >
+                  Steam Market'te Aç
+                  </a>
+
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>

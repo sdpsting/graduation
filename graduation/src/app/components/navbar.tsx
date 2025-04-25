@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const [user, setUser] = useState<{ name: string } | null>(null);
+  const [selectedItemCount, setSelectedItemCount] = useState<number>(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,6 +27,10 @@ export default function Navbar() {
 
   const handleProfileClick = () => {
     router.push('/profile');
+  };
+
+  const handleInventoryClick = () => {
+    router.push('/envanter');  // Envanter sayfasına yönlendirme
   };
 
   return (
@@ -57,7 +62,9 @@ export default function Navbar() {
               <Link href="/market" className="nav-link active text-white">Market</Link>
             </li>
             <li className="nav-item">
-              <Link href="#" className="nav-link text-white">Envanter</Link>
+              <Link href="/envanter" className="nav-link text-white" onClick={handleInventoryClick}>
+                Envanter
+              </Link>
             </li>
             <li className="nav-item">
               <Link href="#" className="nav-link text-white">Eşya Sat</Link>
