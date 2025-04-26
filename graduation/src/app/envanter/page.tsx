@@ -4,13 +4,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useEffect, useState } from 'react';
 import Navbar from 'src/app/components/navbar';
 
-// Tip tanımı
 type InventoryItem = {
   name: string;
   icon_url: string;
   market_hash_name: string;
-  tradable: number;  // Takaslanabilirlik bilgisi
-  selected?: boolean; // Seçilen eşya durumu
+  tradable: number;
+  selected?: boolean;
 };
 
 export default function InventoryPage() {
@@ -19,10 +18,14 @@ export default function InventoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const steamId = '76561198386302142'; // sabit Steam ID
+  const steamId = '76561198386302142';
 
   useEffect(() => {
-    fetch(`https://steamcommunity.com/inventory/${steamId}/730/2?l=english`)
+    // CORS proxy URL
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const steamUrl = `https://steamcommunity.com/inventory/${steamId}/730/2?l=english`;
+
+    fetch(proxyUrl + steamUrl)
       .then(res => res.json())
       .then(data => {
         if (!data || !data.descriptions) {
@@ -30,15 +33,14 @@ export default function InventoryPage() {
           return;
         }
 
-        // Yalnızca takaslanabilir eşyaları filtreleyelim
         const tradableItems = data.descriptions
-          .filter((item: any) => item.tradable === 1)  // Takaslanabilir olanları seçiyoruz
+          .filter((item: any) => item.tradable === 1)
           .map((item: any) => ({
             name: item.name,
             icon_url: item.icon_url,
             market_hash_name: item.market_hash_name,
             tradable: item.tradable,
-            selected: false, // Başlangıçta hiçbiri seçili değil
+            selected: false,
           }));
 
         setItems(tradableItems);
@@ -49,11 +51,9 @@ export default function InventoryPage() {
   }, []);
 
   const handleSelectItem = (item: InventoryItem) => {
-    // Eğer eşyayı daha önce seçmediysek, sol tarafta seçili yapıyoruz
     if (!selectedItems.find(i => i.market_hash_name === item.market_hash_name)) {
       setSelectedItems([...selectedItems, item]);
 
-      // Aynı zamanda sol tarafta ilgili öğeyi de seçili yapıyoruz
       setItems(prevItems =>
         prevItems.map(i =>
           i.market_hash_name === item.market_hash_name ? { ...i, selected: true } : i
@@ -63,10 +63,8 @@ export default function InventoryPage() {
   };
 
   const handleRemoveItem = (item: InventoryItem) => {
-    // Sağ taraftan silindiğinde, sol taraftaki eşyanın solukluğunu kaldırıyoruz
     setSelectedItems(selectedItems.filter(i => i.market_hash_name !== item.market_hash_name));
 
-    // Aynı zamanda, sol tarafta ilgili öğeyi de seçili olmaktan çıkarıyoruz
     setItems(prevItems =>
       prevItems.map(i =>
         i.market_hash_name === item.market_hash_name ? { ...i, selected: false } : i
@@ -76,10 +74,9 @@ export default function InventoryPage() {
 
   const handleSellClick = () => {
     if (selectedItems.length > 0) {
-      // Satış işlemi burada gerçekleşecek
       alert(`${selectedItems.length} eşya satıldı!`);
       setSelectedItems([]);
-      // Eşyaları sattıktan sonra tüm seçimleri sıfırlıyoruz
+
       setItems(prevItems =>
         prevItems.map(i => ({ ...i, selected: false }))
       );
@@ -87,16 +84,14 @@ export default function InventoryPage() {
   };
 
   const handleItemClick = (item: InventoryItem) => {
-    // Sol taraftaki item'a tıklandığında, seçili olup olmadığını kontrol ediyoruz
     setItems(prevState =>
       prevState.map(i =>
         i.market_hash_name === item.market_hash_name
-          ? { ...i, selected: !i.selected } // Seçiliyse, seçimi kaldırıyoruz
+          ? { ...i, selected: !i.selected }
           : i
       )
     );
 
-    // Seçili eşyayı sağ taraftaki seçili listesine ekliyoruz
     if (!selectedItems.find(i => i.market_hash_name === item.market_hash_name)) {
       setSelectedItems([...selectedItems, item]);
     } else {
@@ -109,7 +104,7 @@ export default function InventoryPage() {
       <Navbar />
 
       <div className="row p-4">
-        {/* Envanter Kısmı */}
+        {/* Envanter */}
         <div className="col-md-8">
           <h3 className="mb-4">Envanter</h3>
 
@@ -120,15 +115,16 @@ export default function InventoryPage() {
             {items.length === 0 ? (
               <p>Takaslanabilir eşya bulunamadı.</p>
             ) : (
-              items.map((item, index) => (
-                <div className="col-6 col-md-4 col-lg-3 mb-4" key={index}>
+              items.map((item) => (
+                <div className="col-6 col-md-4 col-lg-3 mb-4" key={item.market_hash_name}>
                   <div
                     className="card-items"
                     style={{
                       backgroundColor: '#222',
                       borderRadius: '8px',
                       padding: '10px',
-                      opacity: item.selected ? 0.5 : 1, // Seçili eşyanın soluklaştırılması
+                      opacity: item.selected ? 0.5 : 1,
+                      cursor: 'pointer',
                     }}
                     onClick={() => handleItemClick(item)}
                   >
@@ -140,9 +136,12 @@ export default function InventoryPage() {
                     <h6 className="mt-2 text-white" style={{ fontSize: '0.9rem' }}>{item.name}</h6>
                     <button
                       className="btn btn-sm btn-warning mt-2"
-                      onClick={() => handleSelectItem(item)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Kart tıklamasını engeller
+                        handleSelectItem(item);
+                      }}
                     >
-                      Sat
+                      Satışa Ekle
                     </button>
                   </div>
                 </div>
@@ -161,8 +160,8 @@ export default function InventoryPage() {
             </h5>
 
             <div className="mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              {selectedItems.map((item, index) => (
-                <div key={index} className="d-flex align-items-center mb-2" style={{ backgroundColor: '#333', padding: '10px', borderRadius: '8px', marginBottom: '10px' }}>
+              {selectedItems.map((item) => (
+                <div key={item.market_hash_name} className="d-flex align-items-center mb-2" style={{ backgroundColor: '#333', padding: '10px', borderRadius: '8px' }}>
                   <img
                     src={`https://community.cloudflare.steamstatic.com/economy/image/${item.icon_url}`}
                     alt={item.name}
@@ -174,7 +173,7 @@ export default function InventoryPage() {
                     className="btn btn-sm btn-danger ms-auto"
                     onClick={() => handleRemoveItem(item)}
                   >
-                    <i className="bi bi-trash"></i> {/* Çöp kutusu ikonu */}
+                    <i className="bi bi-trash"></i>
                   </button>
                 </div>
               ))}
@@ -185,7 +184,7 @@ export default function InventoryPage() {
               disabled={selectedItems.length === 0}
               onClick={handleSellClick}
             >
-              Sat
+              Seçilenleri Sat
             </button>
           </div>
         </div>

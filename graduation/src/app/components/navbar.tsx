@@ -38,7 +38,7 @@ export default function Navbar() {
       <div className="container-fluid">
         <Link href="/" className="navbar-brand">
           <img
-            src="https://ih1.redbubble.net/image.542370055.6839/st,small,507x507-pad,600x600,f8f8f8.jpg"
+            src="https://i.ibb.co/35QDVPGV/testing.png"
             alt="Logo"
             style={{ width: '60px', height: 'auto' }}
             className="d-inline-block align-text-top"
@@ -67,27 +67,12 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="#" className="nav-link text-white">Eşya Sat</Link>
-            </li>
-            <li className="nav-item">
-              <Link href="#" className="nav-link text-white">Eşya Al</Link>
-            </li>
-            <li className="nav-item">
               <Link href="/sss" className="nav-link text-white">S.S.S.</Link>
             </li>
             <li className="nav-item">
               <Link href="/blog" className="nav-link text-white">Blog</Link>
             </li>
           </ul>
-
-          <form className="d-flex me-2">
-            <div className="input-group">
-              <span className="input-group-text search-icon">
-                <i className="bi bi-search"></i>
-              </span>
-              <input className="form-control search-bar" type="search" placeholder="Arama yap" />
-            </div>
-          </form>
 
           {user ? (
             <div className="d-flex align-items-center">
