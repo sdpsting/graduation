@@ -588,7 +588,6 @@ h1 {
   justify-content: center; /* Yatayda ortala */
   align-items: center; /* Dikeyde ortala */
   z-index: 1050; /* Diğer içeriklerin üzerinde görünmesini sağlar */
-
 }
 
 .modal-dialog {
@@ -607,10 +606,11 @@ h1 {
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Başlığı ortalamak için */
   align-items: center;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #495057; /* Ayırıcı çizgi (isteğe bağlı) */
+  margin-left: 5px; /* Header'ı biraz köşeden uzaklaştırmak için */
 }
 
 .modal-title {
@@ -644,6 +644,61 @@ h1 {
   border-top: 1px solid #495057; /* Ayırıcı çizgi (isteğe bağlı) */
 }
 
+.open-steam {
+  width: 100%;
+  background-color: #c2a061;
+  color: white;
+  margin-top: 20px;
+  border-radius: 5px;
+  padding: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+
+/* Buton grup ayarları - Butonları yan yana hizalamak için */
+.button-group {
+  display: flex;
+  justify-content: center; /* Butonları yatayda ortala */
+  gap: 15px; /* Butonlar arasına boşluk bırak */
+  margin-top: 20px; /* Üstten boşluk bırak */
+}
+
+/* Camera ve büyüteç butonları kare şeklinde, diğer butonlarla aynı boyutta */
+.custom-btn {
+  background-color: #ff7300;
+  color: white;
+  border: none;
+  padding: 10px 15px; /* Diğer butonlarla aynı boyutta */
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center; /* İkonu ortalar */
+  align-items: center; /* İkonu dikeyde ortalar */
+  border-radius: 5px; /* Butonun köşelerini yuvarlatmak için */
+  width: 70px; /* Diğer butonla aynı genişlik */
+  height: 70px; /* Diğer butonla aynı yükseklik */
+}
+
+.custom-btn:hover {
+  background-color: #ff5722;
+}
+
+.custom-btn:active {
+  transform: scale(0.98); /* Tıklama efektine ekleme */
+}
+
+.custom-btn i {
+  font-size: 22px; /* İkon boyutunu uygun şekilde küçültmek için */
+  margin: 0; /* Metni kaldırdığımız için margin'i sıfırlıyoruz */
+}
+
+/* Eğer butonların üzerine sadece ikon istiyorsanız, aşağıdaki stil kullanılabilir */
+.custom-btn span {
+  display: none; /* Metni gizle */
+}
+
+/* Steam butonunun özelliklerini değiştirmedik, aynı şekilde kalacak */
 .open-steam {
   width: 100%;
   background-color: #c2a061;

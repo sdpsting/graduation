@@ -1,10 +1,9 @@
-// src/app/components/FilterComponent.tsx
-
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import Navbar from 'src/app/components/navbar';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Item tipini tanımlıyoruz
 type Item = {
@@ -12,6 +11,8 @@ type Item = {
   image: string;
   wears: string;
   price: number;
+  inspect: string;  // inspect verisi
+  ingame: string;   // ingame verisi
 };
 
 function getWearColorClass(wear: string): string {
@@ -206,7 +207,7 @@ export default function FilterComponent() {
 
       {modalContent && (
         <div
-          className="modal-overlay" // Yeni overlay sınıfını ekledik
+          className="modal-overlay"
           onClick={closeModal}
         >
           <div
@@ -214,35 +215,54 @@ export default function FilterComponent() {
             role="document"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-content"> {/* Bootstrap sınıflarını kaldırdık */}
+            <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
                   {modalContent.name}{' '}
-                  <span className="fw-bold text-secondary">({modalContent.wears})</span>
+                  <span style={{ fontWeight: 'bold', color: '#adb5bd' }}>
+                    ({modalContent.wears})
+                  </span>
                 </h5>
                 <button
                   type="button"
-                  className="btn-close" // Bootstrap sınıfını kaldırdık
+                  className="btn-close"
                   onClick={closeModal}
+                  aria-label="Close"
                 />
               </div>
-              <div className="modal-body text-center">
+              <div className="modal-body">
                 <img
                   src={modalContent.image}
                   alt={modalContent.name}
-                  className="img-fluid mb-3"
+                  style={{ maxWidth: '100%', marginBottom: '1rem', borderRadius: '4px' }}
                 />
-                <p className="fw-bold text-white">Fiyat: ${modalContent.price}</p>
-                <a
-                  href={`https://steamcommunity.com/market/listings/730/${encodeURIComponent(
-                    `${modalContent.name} (${modalContent.wears})`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary open-steam mt-3"
-                >
-                  Steam Market'te Aç
-                </a>
+                <p style={{ fontWeight: 'bold', color: 'white', marginBottom: '1rem' }}>
+                  Fiyat: ${modalContent.price}
+                </p>
+                <div className="button-group">
+                  <a
+                    href={`https://steamcommunity.com/market/listings/730/${encodeURIComponent(
+                      `${modalContent.name} (${modalContent.wears})`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="open-steam"
+                  >
+                    Steam Market'te Aç
+                  </a>
+                  <button
+                    onClick={() => window.open(modalContent.inspect, '_blank')}
+                    className="custom-btn"
+                  >
+                    <i className="fas fa-camera"></i> {/* Fotoğraf makinesi ikonu */}
+                  </button>
+                  <button
+                    onClick={() => window.open(modalContent.ingame, '_blank')}
+                    className="custom-btn"
+                  >
+                    <i className="fas fa-search"></i> {/* Büyüteç ikonu */}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

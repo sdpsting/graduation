@@ -10,7 +10,7 @@ export async function GET() {
   });
 
   try {
-    const [rows] = await connection.execute('SELECT name, image, wears , price FROM items');
+    const [rows] = await connection.execute('SELECT name, image, wears , price , inspect , ingame FROM items');
     return NextResponse.json(rows);
   } catch (error) {
     return NextResponse.json({ error: 'Veritabanı hatası' }, { status: 500 });
