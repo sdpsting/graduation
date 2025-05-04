@@ -24,7 +24,14 @@ export async function POST(request: Request) {
 
     if (users.length > 0) {
       const user = users[0];
-      return NextResponse.json({ success: true, message: 'Giriş başarılı!', userName: user.user_name });
+      // Kullanıcıyı döndürürken id ve userName de dahil ediyoruz
+      return NextResponse.json({
+        success: true,
+        message: 'Giriş başarılı!',
+        userId: user.id, // ID'yi döndürüyoruz
+        userName: user.user_name, // Kullanıcı adı
+        balance: user.balance, // Kullanıcının mevcut bakiyesi
+      });
     } else {
       return NextResponse.json({ success: false, message: 'Kullanıcı adı veya şifre hatalı.' });
     }
