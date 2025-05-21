@@ -149,6 +149,36 @@ a {
   transform: scale(1.05);     /* Hover durumunda butonu biraz büyüt */
 }
 
+/* Özel durum kutucukları */
+.wear-checkbox {
+  position: relative;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.wear-checkbox input {
+  display: none;
+}
+
+.wear-checkbox label {
+  display: inline-block;
+  width: 3.1rem;
+  height: 2.4rem;
+  line-height: 2rem;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 0.5rem;
+  background: #444444;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;  
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.wear-checkbox input:checked + label {
+  background: #c2a061;
+  border-color: white;
+}
 
 
 /* Kartlar */
@@ -709,4 +739,76 @@ h1 {
   font-weight: 700;
   text-decoration: none;
   margin-bottom: 20px;
+}
+
+
+/* PAYMENT SAYFASI */
+
+
+/* Arka plan gradyan ve tüm sayfa kapsayıcı */
+
+/* Form kutusu */
+.bg-payment {
+  background-color: #2a2a2a !important;
+}
+.shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+.rounded-2xl {
+  border-radius: 1rem !important;
+}
+
+/* Başlık */
+.payment-page-title {
+  font-size: 1.75rem;
+  color: #c2a061 ;
+
+}
+
+/* Label düzenlemeleri */
+.custom-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #c2a061;
+}
+
+/* Input alanları */
+.form-control {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s;
+
+}
+
+.form-control:focus {
+  border-color: #c2a061;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Buton stil */
+.sign-in-button {
+  background-color: #c2a061;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+  font-size: large;
+  font-weight: 600;
+  outline: 2px solid white;
+
+}
+
+.sign-in-button:hover {
+  background-color: #997d4a;
+}
+
+/* Responsive uyum: mobilde biraz daha dar görünüm */
+@media (max-width: 576px) {
+  .col-12.col-md-6.col-lg-4 {
+    max-width: 90%;
+    margin: 0 auto;
+  }
 }
