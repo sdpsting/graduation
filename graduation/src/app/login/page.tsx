@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from 'src/app/components/navbar'; // Navbar bileşeni eklendi
 
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -22,9 +23,20 @@ export default function LoginPage() {
     });
 
     const data = await response.json();
+
+    // Backend'den dönen yanıtı kontrol edelim
+    console.log("Backend'den gelen veri:", data);
+
     if (data.success) {
       alert('Giriş başarılı! Hoş geldiniz.');
-      localStorage.setItem('user', JSON.stringify({ name: data.userName }));
+
+      // Kullanıcı bilgilerini localStorage'a kaydedelim
+      localStorage.setItem('user', JSON.stringify({
+        id: data.userId, // Backend'den dönen id bilgisini kaydediyoruz
+        name: data.userName,
+        balance: data.balance // Backend'den gelen balance bilgisini de ekliyoruz
+      }));
+
       router.push('/');
     } else {
       alert(data.message || 'Giriş sırasında bir hata oluştu.');

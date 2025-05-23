@@ -6,15 +6,32 @@ import { useEffect, useState } from 'react';
 
 export default function Navbar() {
   const [user, setUser] = useState<{ name: string } | null>(null);
-  const [selectedItemCount, setSelectedItemCount] = useState<number>(0);
+  const [balance, setBalance] = useState<number | null>(null); // Bakiye durumu eklendi
   const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+
+      const userId = JSON.parse(storedUser).id;
+      fetchBalance(userId); // Kullanıcı bilgisiyle bakiye verisini al
     }
   }, []);
+
+  const fetchBalance = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`);
+      const data = await response.json();
+      if (data.success && data.user) {
+        setBalance(data.user.balance); // API'den gelen bakiyeyi state'e kaydet
+      } else {
+        console.error('Bakiye verisi alınamadı');
+      }
+    } catch (error) {
+      console.error('Bakiye verisi alınırken bir hata oluştu:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -22,7 +39,7 @@ export default function Navbar() {
   };
 
   const handleBalanceClick = () => {
-    router.push('/payment');
+    router.push('/pay'); // Bakiye kısmına tıklanınca ödeme sayfasına yönlendirme
   };
 
   const handleProfileClick = () => {
@@ -30,7 +47,7 @@ export default function Navbar() {
   };
 
   const handleInventoryClick = () => {
-    router.push('/envanter');  // Envanter sayfasına yönlendirme
+    router.push('/envanter');
   };
 
   return (
@@ -83,7 +100,7 @@ export default function Navbar() {
                 onClick={handleBalanceClick}
               >
                 <span className="balance-label">Bakiye</span>
-                <span className="balance-amount">$1000</span>
+                <span className="balance-amount">${balance !== null ? balance : 'Yükleniyor...'}</span>
               </div>
 
               <div
