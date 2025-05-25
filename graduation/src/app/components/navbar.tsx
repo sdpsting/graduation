@@ -84,6 +84,9 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
+              <Link href="/withdrawal" className="nav-link text-white">Eşya Çek</Link>
+            </li>
+            <li className="nav-item">
               <Link href="/sss" className="nav-link text-white">S.S.S.</Link>
             </li>
             <li className="nav-item">

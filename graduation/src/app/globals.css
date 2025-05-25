@@ -91,7 +91,7 @@ a {
 /* Filtreleme kutusunun konumu ve stili*/
 .filter-container {
   position: fixed;
-  top: 100px; 
+  top: 103px; 
   left: 12px;
   width: 330px; 
   height: 80%;
@@ -100,6 +100,7 @@ a {
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   z-index: 100; 
   padding: 20px;
+  border-radius: 5px;
 }
 
 /* Fiyat belirleme kutucuklarının arka plan rengini değiştirme */
@@ -127,6 +128,37 @@ a {
   box-shadow: none;
 }
 
+/* Özel durum kutucukları */
+.wear-checkbox {
+  position: relative;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.wear-checkbox input {
+  display: none;
+}
+
+.wear-checkbox label {
+  display: inline-block;
+  width: 3.1rem;
+  height: 2.4rem;
+  line-height: 2rem;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 0.5rem;
+  background: #444444;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;  
+  transition: background 0.2s, border-color 0.2s;
+  padding: 0;
+}
+
+.wear-checkbox input:checked + label {
+  background: #c2a061;
+  border-color: white;
+}
 
 /* Uygula butonunu özelleştirmek */
 .btn-apply {
@@ -548,18 +580,16 @@ h1 {
 
 .reset-button {
   width: 100%;
-  background-color: #b12f2f;
+  background-color: #b12f2fa6;
   color: white;
   margin-top: 20px;
   border-radius: 5px;
-  padding: 2px;
+  padding: 4px;
   font-weight: 700;
-
 }
 
 .custom-label {
   font-weight: 700;
-
 }
 
 .price-range {
@@ -709,4 +739,94 @@ h1 {
   font-weight: 700;
   text-decoration: none;
   margin-bottom: 20px;
+}
+
+/* Silah türü kutusu konteyneri */
+.weapon-type-container {
+  background-color: #282828; /* Yarı şeffaf koyu zemin */
+  display: flex;
+  align-items: center;
+  height: 50px;               /* Yüksekliği 50px olarak koruduk */
+  padding: 0 10px;            /* Yatayda hafif boşluk */
+  margin-bottom: 1rem;        /* Altında biraz boşluk */
+  margin-top: 1rem;
+  margin-left: 374px;
+  width: 79%;
+  border-radius: 5px;
+}
+
+/* Her bir kutucuk */
+.small-box {
+  padding: 0.3rem 5.5rem;   /* Dikeyde 4px, yatayda 12px dolgu */
+  border: 0px solid #ccc;     /* İnce gri kenarlık */
+  border-radius: 5px;     /* Hafif yuvarlak köşeler */
+  color: #fff;                /* Yazı beyaz */
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  margin-right: 33px;
+}
+
+/* Hover efekti */
+.small-box:hover {
+  background-color: #ad8d50;
+}
+
+/* Seçili kutucuk */
+.active-box {
+  background-color: #c2a061;  /* Bootstrap’ın kırmızı tonu */
+  border-color: #c2a061;
+}
+
+
+/* payment sayfası */
+
+.custom-text {
+  color: #c2a061;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.payment-card {
+  background-color: #282828; /* İstediğin rengi buraya yaz */
+}
+
+
+.amount-input {
+  background-color: #414141 !important;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s;
+  box-shadow: none !important;
+
+}
+
+.amount-input:focus {
+  box-shadow: none !important;
+  outline: none !important;
+  
+}
+
+/* Buton stil */
+.sign-in-button {
+  background-color: #c2a061;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+  font-weight: 600;
+  outline: 2px solid white;
+}
+
+.sign-in-button:hover {
+  background-color: #997d4a;
+}
+
+/* Responsive uyum: mobilde biraz daha dar görünüm */
+@media (max-width: 576px) {
+  .col-12.col-md-6.col-lg-4 {
+    max-width: 90%;
+    margin: 0 auto;
+  }
 }

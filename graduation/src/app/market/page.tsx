@@ -3,7 +3,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect } from 'react';
 import Navbar from 'src/app/components/navbar';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Item tipini tanımlıyoruz
 type Item = {
@@ -11,32 +10,34 @@ type Item = {
   image: string;
   wears: string;
   price: number;
-  inspect: string;  // inspect verisi
-  ingame: string;   // ingame verisi
+  inspect: string;
+  ingame: string;
 };
 
-function getWearColorClass(wear: string): string {
-  switch (wear) {
-    case 'Factory New':
-      return 'factory-new';
-    case 'Minimal Wear':
-      return 'minimal-wear';
-    case 'Field-Tested':
-      return 'field-tested';
-    case 'Well-Worn':
-      return 'well-worn';
-    case 'Battle-Scarred':
-      return 'battle-scarred';
-    default:
-      return 'text-white';
-  }
-}
+// Aşınmışlık kodları ve varsayılan filtre değeri
+const wearCodes: Record<string, string> = {
+  'Factory New': 'FN',
+  'Minimal Wear': 'MW',
+  'Field-Tested': 'FT',
+  'Well-Worn': 'WW',
+  'Battle-Scarred': 'BS',
+};
+
+const defaultWearFilters: Record<string, boolean> = Object.keys(wearCodes).reduce(
+  (acc, key) => ({ ...acc, [key]: true }),
+  {} as Record<string, boolean>
+);
+
+// Silah tipleri
+const weaponTypes = ['Gloves', 'Heavy', 'Knives', 'Pistols', 'Rifles', 'SMGs'];
 
 export default function FilterComponent() {
   const [selectedFilters, setSelectedFilters] = useState({
     searchQuery: '',
     priceRange: { min: 0, max: 10000 },
+    wearFilters: defaultWearFilters,
   });
+  const [selectedWeaponType, setSelectedWeaponType] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export default function FilterComponent() {
 
   const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      applyFilters(); // Enter tuşuna basıldığında filtreleri uygula
+      applyFilters();
     }
   };
 
@@ -86,6 +87,20 @@ export default function FilterComponent() {
     }));
   };
 
+  const handleWearChange = (wear: string) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      wearFilters: {
+        ...prev.wearFilters,
+        [wear]: !prev.wearFilters[wear],
+      },
+    }));
+  };
+
+  const handleWeaponTypeChange = (type: string) => {
+    setSelectedWeaponType((prev) => (prev === type ? null : type));
+  };
+
   const applyFilters = () => {
     const { min, max } = selectedFilters.priceRange;
     if (min > max) {
@@ -98,7 +113,10 @@ export default function FilterComponent() {
       const searchOk = item.name
         .toLowerCase()
         .includes(selectedFilters.searchQuery.toLowerCase());
-      return priceOk && searchOk;
+      const wearOk = selectedFilters.wearFilters[item.wears];
+      // Eğer bir silah tipi seçildiyse, item.type ile eşleşmesi gerekir
+      const typeOk = selectedWeaponType ? item.name.includes(selectedWeaponType) : true;
+      return priceOk && searchOk && wearOk && typeOk;
     });
     setFilteredItems(filtered);
   };
@@ -107,18 +125,50 @@ export default function FilterComponent() {
     setSelectedFilters({
       searchQuery: '',
       priceRange: { min: 0, max: 10000 },
+      wearFilters: defaultWearFilters,
     });
-    setFilteredItems(items); // Tüm öğeleri tekrar göster
+    setSelectedWeaponType(null);
+    setFilteredItems(items);
+    setError(null);
   };
 
   const handleCardClick = (item: Item) => setModalContent(item);
   const closeModal = () => setModalContent(null);
 
+  const getWearColorClass = (wear: string): string => {
+    switch (wear) {
+      case 'Factory New':
+        return 'factory-new';
+      case 'Minimal Wear':
+        return 'minimal-wear';
+      case 'Field-Tested':
+        return 'field-tested';
+      case 'Well-Worn':
+        return 'well-worn';
+      case 'Battle-Scarred':
+        return 'battle-scarred';
+      default:
+        return 'text-white';
+    }
+  };
+
   return (
     <div className="container-fluid p-0 custom-background">
       <Navbar />
 
-      <div className="row m-0 g-0">
+      {/* Silah Türü Seçim Kutusu */}
+      <div className="weapon-type-container">
+        {weaponTypes.map((type) => (
+          <div
+            key={type}
+            className={`small-box ${selectedWeaponType === type ? 'active-box' : ''}`}
+            onClick={() => handleWeaponTypeChange(type)}>
+            {type}
+          </div>
+        ))}
+      </div>
+
+      <div className="row m-0 g-0" style={{ marginTop: '60px' }}>
         <aside className="col-12 col-md-2 p-4">
           <div className="filter-container text-white">
             <h5>Filtrele</h5>
@@ -135,7 +185,7 @@ export default function FilterComponent() {
                   placeholder="Eşya arayın..."
                   value={selectedFilters.searchQuery}
                   onChange={handleSearchChange}
-                  onKeyDown={handleSearchKeyDown} // Enter tuşu için olay ekledik
+                  onKeyDown={handleSearchKeyDown}
                 />
               </div>
             </div>
@@ -163,13 +213,29 @@ export default function FilterComponent() {
                 />
               </div>
             </div>
-            <button className="btn-primary apply-button" onClick={applyFilters}>
+
+            {/* Durum filtresi */}
+            <div className="custom-label mt-3">
+              <label>Aşınmışlık</label>
+              <div className="d-flex flex-wrap">
+                {Object.entries(wearCodes).map(([wear, code]) => (
+                  <div key={wear} className="wear-checkbox me-2">
+                    <input
+                      type="checkbox"
+                      id={wear}
+                      checked={selectedFilters.wearFilters[wear]}
+                      onChange={() => handleWearChange(wear)}
+                    />
+                    <label htmlFor={wear} className="">{code}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button className="btn-primary apply-button mt-3" onClick={applyFilters}>
               Uygula
             </button>
-            <button
-              className="btn-primary reset-button reset-button mt-2"
-              onClick={resetFilters}
-            >
+            <button className="btn-primary reset-button mt-2" onClick={resetFilters}>
               Filtreyi Sıfırla
             </button>
             {error && <p className="text-danger mt-2">{error}</p>}
@@ -254,13 +320,13 @@ export default function FilterComponent() {
                     onClick={() => window.open(modalContent.inspect, '_blank')}
                     className="custom-btn"
                   >
-                    <i className="fas fa-camera"></i> {/* Fotoğraf makinesi ikonu */}
+                    <i className="fas fa-camera"></i>
                   </button>
                   <button
                     onClick={() => window.open(modalContent.ingame, '_blank')}
                     className="custom-btn"
                   >
-                    <i className="fas fa-search"></i> {/* Büyüteç ikonu */}
+                    <i className="fas fa-search"></i>
                   </button>
                 </div>
               </div>
