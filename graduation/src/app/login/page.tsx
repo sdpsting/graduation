@@ -1,19 +1,40 @@
+// src/app/login/page.tsx (veya .jsx)
+
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from 'src/app/components/navbar';
+import Navbar from 'src/app/components/navbar'; // Navbar'ınızın doğru yolda olduğundan emin olun
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Sayfa yüklendiğinde kullanıcı zaten giriş yapmış mı diye kontrol et
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    // console.log('LoginPage useEffect - Token kontrol ediliyor:', token); // Hata ayıklama için log
+    if (token) {
+      // console.log('LoginPage useEffect - Token bulundu, /market sayfasına yönlendiriliyor.'); // Hata ayıklama için log
+      // Kullanıcı zaten giriş yapmış, market sayfasına (veya ana sayfaya) yönlendir.
+      // router.replace() kullanılırsa geri tuşuyla login sayfasına dönülemez.
+      router.replace('/market');
+    } else {
+      // console.log('LoginPage useEffect - Token bulunamadı, login sayfasında kalınıyor.'); // Hata ayıklama için log
+    }
+  }, [router]); // router objesi değişmeyeceği için bu genellikle sadece mount'ta çalışır,
+                // ancak dependency array'de olması iyi bir pratiktir.
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
-    try { // Hata yakalamak için try-catch bloğu ekleyelim
+    try {
       const response = await fetch('/api/login', { // Backend login endpoint'iniz
         method: 'POST',
         headers: {
@@ -22,49 +43,34 @@ export default function LoginPage() {
         body: JSON.stringify({ username, password }),
       });
 
-      // Yanıtın başarılı olup olmadığını kontrol edelim (örn: 200 OK)
-      if (!response.ok) {
-        // Başarısız bir HTTP yanıtı durumunda (4xx, 5xx)
-        const errorData = await response.json().catch(() => ({ message: "Sunucudan geçersiz yanıt." })); // JSON parse hatası olursa
-        alert(errorData.message || `Giriş sırasında bir sunucu hatası oluştu: ${response.status}`);
-        return; // İşlemi burada sonlandır
-      }
-
       const data = await response.json();
 
-      // Backend'den dönen yanıtı kontrol edelim
-      console.log("Backend'den gelen veri:", data);
+      if (!response.ok) {
+        setError(data.message || `Sunucu hatası: ${response.status}`);
+        setLoading(false);
+        return;
+      }
 
-      if (data.success) {
-        alert('Giriş başarılı! Hoş geldiniz.');
+      if (data.success && data.token && data.user) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
 
-        // Kullanıcı bilgilerini localStorage'a kaydedelim
-        // Mevcut user objesine steamId'yi de ekliyoruz
-        localStorage.setItem('user', JSON.stringify({
-          id: data.userId,
-          name: data.userName,
-          balance: data.balance,
-          steamId: data.steamId, // <<< YENİ EKLENEN SATIR: steamId'yi buraya ekliyoruz
-        }));
-
-        // İsteğe bağlı: localStorage'a ayrı ayrı da kaydedebilirsiniz,
-        // bu InventoryPage'deki okuma mantığını biraz değiştirebilir.
-        // Ama tek bir 'user' objesi daha düzenli.
-        // localStorage.setItem('loggedInUserId', data.userId.toString());
-        // localStorage.setItem('loggedInUserName', data.userName);
-        // localStorage.setItem('loggedInUserBalance', data.balance.toString());
-        // localStorage.setItem('loggedInUserSteamId', data.steamId);
-
-
-        router.push('/'); // Anasayfaya veya inventory sayfasına yönlendir
-        // router.push('/inventory'); // Eğer doğrudan envantere gitmesini istiyorsanız
+        // Yönlendirme: Başarılı giriş sonrası kullanıcıyı istediğiniz sayfaya yönlendirin
+        // Örnek: Market sayfasına yönlendirme
+        // Navbar gibi bileşenlerin anında güncellenmesi için en iyi yol global state (Context API)
+        // veya bazı durumlarda window.location.href ile tam sayfa yenileme düşünülebilir.
+        // Şimdilik router.push() ile client-side navigasyon yapıyoruz.
+        // Navbar'ın güncellenmesi için, Navbar'daki useEffect'in LocalStorage'ı okumasına güveniyoruz.
+        router.push('/market');
 
       } else {
-        alert(data.message || 'Giriş sırasında bir hata oluştu (API success:false).');
+        setError(data.message || 'Giriş sırasında bilinmeyen bir hata oluştu.');
       }
-    } catch (error) {
-      console.error("Login frontend hatası:", error);
-      alert("Giriş işlemi sırasında bir ağ hatası veya beklenmedik bir sorun oluştu.");
+    } catch (err) {
+      console.error("Login frontend hatası:", err);
+      setError("Giriş işlemi sırasında bir ağ hatası veya beklenmedik bir sorun oluştu.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,6 +80,7 @@ export default function LoginPage() {
       <div className="d-flex justify-content-center align-items-center vh-100 custom-login-background">
         <div className="p-4 shadow custom-login-card" style={{ maxWidth: '400px', width: '100%' }}>
           <h2 className="text-center mb-4 text-white">Giriş Yap</h2>
+          {error && <div className="alert alert-danger" role="alert">{error}</div>}
           <form onSubmit={handleLogin}>
             <div className="mb-3">
               <label htmlFor="username" className="form-label text-white">
@@ -86,6 +93,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
             <div className="mb-3">
@@ -99,12 +107,15 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
-            <button type="submit" className="btn-primary login-button">Giriş Yap</button>
+            <button type="submit" className="btn-primary login-button w-100" disabled={loading}>
+              {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
+            </button>
             <div className="text-center mt-3">
               <a href="/register" className="register-text">
-                Kayıt Ol
+                Hesabın yok mu? Kayıt Ol
               </a>
             </div>
           </form>
