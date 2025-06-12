@@ -1,11 +1,11 @@
 // src/app/api/market/sell-item/route.ts
 import { NextResponse, NextRequest } from 'next/server';
-import { createPool, Pool, ResultSetHeader } from 'mysql2/promise'; // ResultSetHeader eklendi
+import { createPool, Pool, ResultSetHeader } from 'mysql2/promise';
 
 const dbConfig = { 
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '1234',
+  password: process.env.DB_PASSWORD || '1234', // GERÇEK ŞİFRENİ KULLAN (.env.local)
   database: process.env.DB_NAME || 'marketdb',
   waitForConnections: true,
   connectionLimit: 10,
@@ -20,9 +20,9 @@ try {
 }
 
 interface SellItemRequestBody {
-  inventoryId: number;
-  itemId: string;
-  sellPrice: number;
+  inventoryId: number; // user_inventory tablosundaki ID
+  itemId: string;      // items tablosundaki ürünün asıl ID'si
+  sellPrice: number;   // Kullanıcının belirlediği satış fiyatı
 }
 
 export async function POST(request: NextRequest) {
@@ -47,8 +47,15 @@ export async function POST(request: NextRequest) {
     connection = await pool.getConnection();
     await connection.beginTransaction();
 
+    // 1. user_inventory'den item'ı bul ve items tablosundaki mevcut fiyatını da al.
     const [inventoryRows] = await connection.execute<any[]>(
-      'SELECT ii.item_id, i.name as item_name, i.image as item_image, i.wears as item_wears, i.inspect as item_inspect, i.ingame as item_ingame, i.category_name as item_category FROM user_inventory ii JOIN items i ON ii.item_id = i.id WHERE ii.inventory_id = ? AND ii.user_id = ? AND ii.item_id = ?',
+      `SELECT 
+         ui.item_id, 
+         i.name as item_name, 
+         i.price as current_market_price  -- MEVCUT MARKET FİYATINI ALIYORUZ
+       FROM user_inventory ui 
+       JOIN items i ON ui.item_id = i.id 
+       WHERE ui.inventory_id = ? AND ui.user_id = ? AND ui.item_id = ?`,
       [inventoryId, currentUserId, itemId]
     );
 
@@ -57,27 +64,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Satılacak eşya envanterinizde bulunamadı veya size ait değil.' }, { status: 404 });
     }
     const itemToSellDetails = inventoryRows[0];
+    const currentMarketPrice = itemToSellDetails.current_market_price; // Bu, previous_price olacak
 
-    // items tablosundaki ilgili item'ı güncelle
+    // 2. items tablosundaki ilgili item'ı güncelle
+    // status = 'available', price = yeni sellPrice, previous_price = currentMarketPrice, buyer_id = NULL, seller_id = currentUserId
     const [updateResult] = await connection.execute(
-      'UPDATE items SET status = ?, price = ?, buyer_id = NULL, seller_id = ? WHERE id = ?',
-      ['available', sellPrice.toFixed(2), currentUserId, itemId]
+      'UPDATE items SET status = ?, price = ?, previous_price = ?, buyer_id = NULL, seller_id = ? WHERE id = ?',
+      ['available', sellPrice.toFixed(2), currentMarketPrice, currentUserId, itemId]
     );
 
-    // ---- Tip İddiası (Type Assertion) ----
     if ((updateResult as ResultSetHeader).affectedRows === 0) {
       await connection.rollback();
       console.warn(`[API/sell-item] Items tablosunda item güncellenemedi. Item ID: ${itemId}, Satıcı: ${currentUserId}`);
       return NextResponse.json({ success: false, message: 'Eşya markette listelenirken bir sorun oluştu (item bulunamadı/güncellenemedi).' }, { status: 500 });
     }
 
-    // user_inventory'den bu kaydı sil
+    // 3. user_inventory'den bu kaydı sil
     const [deleteResult] = await connection.execute(
       'DELETE FROM user_inventory WHERE inventory_id = ? AND user_id = ?',
       [inventoryId, currentUserId]
     );
 
-    // ---- Tip İddiası (Type Assertion) ----
     if ((deleteResult as ResultSetHeader).affectedRows === 0) {
       await connection.rollback();
       console.warn(`[API/sell-item] user_inventory'den item silinemedi. Inventory ID: ${inventoryId}, Kullanıcı: ${currentUserId}`);
