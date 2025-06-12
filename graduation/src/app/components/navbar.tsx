@@ -3,229 +3,181 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState }
-from 'react'; // React'ı import etmeyi unutmayın
+import React, { useEffect, useState, useCallback } from 'react';
 
-// LocalStorage'dan okunacak user objesinin tip tanımı
-// Login API'nizin döndürdüğü user objesine göre bu alanları güncelleyin
 type StoredUser = {
   id: number;
   name: string;
-  balance: string | number; // API'niz string dönüyorsa string, number ise number
+  balance: string | number; // String veya number olabilir, formatBalance halleder
   steamId?: string;
-  role?: string;
+  role?: 'user' | 'admin' | string;
 };
 
 export default function Navbar() {
   const [loggedInUser, setLoggedInUser] = useState<StoredUser | null>(null);
-  // Bakiye için ayrı bir state tutmak yerine loggedInUser.balance'ı kullanabiliriz.
-  // Ancak sizin fetchBalance mantığınızı korumak için ayrı state'i bırakıyorum.
-  // Eğer login sonrası user objesinde güncel bakiye varsa, fetchBalance'a gerek kalmayabilir.
-  const [currentBalance, setCurrentBalance] = useState<number | string | null>(null);
+  const [currentBalance, setCurrentBalance] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    setIsClient(true); // Component client'da mount oldu
-    const token = localStorage.getItem('token');
+  const loadUserData = useCallback(async () => {
+    const token = localStorage.getItem('token'); // Token anahtarının 'token' olduğundan emin ol
     const storedUserString = localStorage.getItem('user');
-
     if (token && storedUserString) {
       try {
         const parsedUser: StoredUser = JSON.parse(storedUserString);
         setLoggedInUser(parsedUser);
-        // Eğer user objesinde bakiye varsa ve güncelse, fetchBalance'a gerek kalmaz.
-        // setCurrentBalance(parsedUser.balance);
-        // Ya da fetchBalance'ı burada çağırın
-        if (parsedUser.id) {
-          fetchBalance(String(parsedUser.id));
-        }
+        setCurrentBalance(String(parsedUser.balance)); // String olarak alalım
       } catch (e) {
-        console.error("localStorage'daki kullanıcı verisi parse edilemedi:", e);
-        // Hatalı veri varsa temizleyelim
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-        setLoggedInUser(null);
-        setCurrentBalance(null);
+        console.error("Navbar: localStorage parse hatası:", e);
+        localStorage.removeItem('user'); localStorage.removeItem('token');
+        setLoggedInUser(null); setCurrentBalance(null);
       }
     } else {
-      // Token veya user bilgisi yoksa, kullanıcı giriş yapmamış demektir.
-      setLoggedInUser(null);
-      setCurrentBalance(null);
+      setLoggedInUser(null); setCurrentBalance(null);
     }
-  }, []); // Sadece component mount olduğunda çalışır
+  }, []);
 
-
-  // Login/Logout sonrası Navbar'ı güncellemek için bir dinleyici
-  // Bu, farklı sekmeler arası storage değişikliklerini yakalar.
-  // Aynı sekme için, login/logout fonksiyonları sonrası state'i manuel güncellemek (aşağıdaki handleLogout'ta olduğu gibi)
-  // veya global state (Context API) kullanmak daha etkilidir.
   useEffect(() => {
-    if (!isClient) return;
+    setIsClient(true); // Bu, component'in client'da olduğundan emin olmak için
+    loadUserData();
+  }, [loadUserData]);
 
+  useEffect(() => {
+    if (!isClient) return; // Sadece client'da çalışsın
     const handleStorageChange = (event: StorageEvent) => {
-      // Sadece 'token' veya 'user' anahtarları değiştiğinde ilgilen
       if (event.key === 'token' || event.key === 'user') {
-        console.log("Storage değişti, Navbar güncelleniyor (event listener). Key:", event.key);
-        const token = localStorage.getItem('token');
-        const storedUserString = localStorage.getItem('user');
-        if (token && storedUserString) {
-          try {
-            const parsedUser: StoredUser = JSON.parse(storedUserString);
-            setLoggedInUser(parsedUser);
-            if (parsedUser.id) fetchBalance(String(parsedUser.id));
-          } catch (e) {
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
-            setLoggedInUser(null);
-            setCurrentBalance(null);
-          }
-        } else {
-          setLoggedInUser(null);
-          setCurrentBalance(null);
-        }
+        loadUserData();
       }
     };
-
     window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [isClient]);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isClient, loadUserData]);
 
-
-  const fetchBalance = async (userId: string) => {
-    if (!userId) return;
-    try {
-      // Bu API endpoint'inin token gerektirip gerektirmediğini kontrol edin.
-      // Eğer token gerektiriyorsa, Authorization header eklemeniz gerekir.
-      // Şimdilik token gerektirmediğini varsayıyorum.
-      const response = await fetch(`/api/users/${userId}`); // Kullanıcıya özel bakiye endpoint'i
-      const data = await response.json();
-      if (data.success && data.user && typeof data.user.balance !== 'undefined') {
-        setCurrentBalance(data.user.balance);
-      } else {
-        console.error('Bakiye verisi alınamadı veya format yanlış:', data.message);
-        // setCurrentBalance(null); // veya varsayılan bir değer
-      }
-    } catch (error) {
-      console.error('Bakiye verisi alınırken bir hata oluştu:', error);
-      // setCurrentBalance(null);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // TOKEN'I SİL
+  const handleLogout = (redirect = true) => {
+    localStorage.removeItem('token'); 
     localStorage.removeItem('user');
     setLoggedInUser(null);
     setCurrentBalance(null);
-    router.push('/login'); // Login sayfasına yönlendir
-    // window.location.href = '/login'; // Daha keskin bir yönlendirme için
+    if (redirect) router.push('/login');
   };
 
-  // Yönlendirme fonksiyonları (bunlar router.push kullandığı için client-side navigasyon yapar)
   const handleBalanceClick = () => router.push('/pay');
   const handleProfileClick = () => router.push('/profile');
-  // handleInventoryClick zaten Link component'inde onClick ile tanımlı, Link'e href vermek yeterli.
 
+  // Client-side render öncesi için basit bir iskelet.
+  // Bu, hydration hatalarını önlemeye yardımcı olur ve sayfa ilk yüklenirken kaymaları azaltır.
   if (!isClient) {
-    // SSR veya hydration öncesi için basit bir placeholder
     return (
-      <nav className="navbar navbar-expand-lg navbar-background">
+      <nav className="navbar navbar-expand-lg navbar-background"> {/* Senin CSS class'ın */}
         <div className="container-fluid">
           <Link href="/" className="navbar-brand">
             <img src="https://i.ibb.co/35QDVPGV/testing.png" alt="Logo" style={{ width: '60px' }} />
           </Link>
-          {/* Placeholder içerik veya boş bırakılabilir */}
+          {/* Menü toggle butonu (placeholder) */}
+          <button className="navbar-toggler" type="button">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          {/* Diğer placeholder içerikler eklenebilir, ama genellikle boş bırakılır. */}
         </div>
       </nav>
     );
   }
 
+  const formatBalance = (balance: string | null): string => {
+    if (balance === null || balance === undefined) return 'Yükleniyor...'; // Veya '-'
+    const numBalance = parseFloat(balance);
+    if (isNaN(numBalance)) return 'N/A'; // Hatalı bakiye durumu
+    return `$${numBalance.toFixed(2)}`; // Para birimi sembolünü isteğe göre değiştir
+  }
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-background">
-      <div className="container-fluid">
+    // ---- NAVBAR'IN ANA SATIRI ----
+    // `bg-dark` gibi Bootstrap arka plan class'larını kaldırdım, senin `navbar-background` class'ın kullanılacak.
+    <nav className="navbar navbar-expand-lg navbar-background"> 
+    {/* ----------------------------- */}
+      <div className="container-fluid"> {/* Tam genişlik için container-fluid */}
         <Link href="/" className="navbar-brand">
           <img
-            src="https://i.ibb.co/35QDVPGV/testing.png"
+            src="https://i.ibb.co/M2gLGLV/image.png" // Logo URL'niz
             alt="Logo"
             style={{ width: '60px', height: 'auto' }}
             className="d-inline-block align-text-top"
           />
         </Link>
         <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarContent"
-          aria-controls="navbarContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          className="navbar-toggler" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarContent" aria-controls="navbarContent"
+          aria-expanded="false" aria-label="Toggle navigation"
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon" style={{filter: 'invert(1)'}}></span> {/* Mobil toggle icon rengi için */}
         </button>
 
         <div className="collapse navbar-collapse" id="navbarContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link href="/market" className="nav-link active text-white">Market</Link>
+              {/* text-white gibi Bootstrap renk class'ları yerine CSS'indeki .nav-link stilini kullan */}
+              <Link href="/market" className="nav-link">Market</Link>
             </li>
-            {loggedInUser && ( // Kullanıcı giriş yapmışsa göster
+            {loggedInUser && (
               <>
                 <li className="nav-item">
-                  <Link href="/envanter" className="nav-link text-white">Envanter</Link>
+                  <Link href="/envanter" className="nav-link">Envanterim</Link>
                 </li>
                 <li className="nav-item">
-                  <Link href="/withdrawal" className="nav-link text-white">Eşya Çek</Link>
+                  <Link href="/withdrawal" className="nav-link">Eşya Yönetimi</Link>
                 </li>
               </>
             )}
+            {loggedInUser && loggedInUser.role === 'admin' && (
+              <li className="nav-item">
+                <Link href="/admin" className="nav-link text-warning fw-bold">Admin Paneli</Link> {/* Bu özel kalabilir */}
+              </li>
+            )}
             <li className="nav-item">
-              <Link href="/sss" className="nav-link text-white">S.S.S.</Link>
+              <Link href="/sss" className="nav-link">S.S.S.</Link>
             </li>
             <li className="nav-item">
-              <Link href="/blog" className="nav-link text-white">Blog</Link>
+              <Link href="/blog" className="nav-link">Blog</Link>
             </li>
           </ul>
 
           {loggedInUser ? (
             <div className="d-flex align-items-center">
-              <span className="text-white me-3">Hoş geldin, {loggedInUser.name}</span>
-
+              {/* text-white gibi Bootstrap renk class'ları yerine CSS'indeki genel metin rengini kullan */}
+              <span className="me-3" style={{color: 'var(--foreground)'}}>Hoş geldin, {loggedInUser.name}</span>
+              
               <div
-                className="balance-container d-flex flex-column justify-content-center align-items-center me-3"
+                className="balance-container d-flex flex-column justify-content-center align-items-center me-3" // CSS'indeki .balance-container kullanılacak
                 onClick={handleBalanceClick}
-                style={{ cursor: 'pointer' }}
               >
-                <span className="balance-label">Bakiye</span>
-                <span className="balance-amount">
-                  {typeof currentBalance === 'number' ? `$${currentBalance.toFixed(2)}` :
-                   typeof currentBalance === 'string' ? `$${parseFloat(currentBalance).toFixed(2)}` :
-                   'Yükleniyor...'}
-                </span>
+                <span className="balance-label">Bakiye</span> {/* CSS'indeki .balance-label */}
+                <span className="balance-amount">{formatBalance(currentBalance)}</span> {/* CSS'indeki .balance-amount */}
               </div>
 
               <div
-                className="account-logo me-3"
+                className="account-logo me-3" // CSS'te bu class'a stil verebilirsin
                 style={{ cursor: 'pointer' }}
                 onClick={handleProfileClick}
               >
                 <img
                   src="https://w7.pngwing.com/pngs/215/58/png-transparent-computer-icons-google-account-scalable-graphics-computer-file-my-account-icon-rim-123rf-symbol-thumbnail.png"
                   alt="Account"
-                  style={{ width: '40px', height: 'auto', borderRadius: '50%' }}
+                  style={{ width: '35px', height: '35px', borderRadius: '50%' }}
                 />
               </div>
-              <button className="btn btn-outline-light" type="button" onClick={handleLogout}>
+              <button className="btn btn-danger" type="button" onClick={() => handleLogout()}> {/* Bootstrap danger butonu */}
                 Çıkış Yap
               </button>
             </div>
           ) : (
-            <Link href="/login" passHref legacyBehavior>
-              <a className="btn btn-outline-light" role="button">Giriş Yap</a>
-            </Link>
-            // Kayıt ol butonu da eklenebilir
-            // <Link href="/register" passHref legacyBehavior><a className="btn btn-light ms-2" role="button">Kayıt Ol</a></Link>
+            <div className="d-flex">
+              <Link href="/login" className="btn btn-outline-light me-2" role="button">
+                Giriş Yap
+              </Link>
+              <Link href="/register" className="btn btn-warning" role="button"> {/* text-dark eklenebilir */}
+                Kayıt Ol
+              </Link>
+            </div>
           )}
         </div>
       </div>

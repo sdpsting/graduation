@@ -55,6 +55,7 @@ a {
 
 .nav-link {
   margin-right: 25px; /* Sekmeler arasındaki boşluğu artırır */
+  color: white;
 }
 
 .sign-in-button {

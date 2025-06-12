@@ -1,111 +1,120 @@
 // src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import * as jose from 'jose'; // jose'yi import et
+import * as jose from 'jose';
 
-// JWT_SECRET'i config dosyanızdan veya .env'den alın
-import { JWT_SECRET as ENV_JWT_SECRET } from './config/config'; // YOLUNUZU KONTROL EDİN
+// Config dosyasının yolu middleware'e göre ./config/config.ts olmalı
+import { JWT_SECRET as ENV_JWT_SECRET } from './config/config'; 
 
-// JWT_SECRET'i jose için uygun formata getirin (Uint8Array)
 let secretKey: Uint8Array;
 try {
     if (!ENV_JWT_SECRET) {
-        throw new Error('JWT_SECRET ortam değişkeni middleware için tanımlanmamış!');
+        console.error("KRİTİK HATA [Middleware]: JWT_SECRET tanımlanmamış!");
+        if (process.env.NODE_ENV === 'development') {
+            console.warn("[Middleware]: Geliştirme için geçici JWT_SECRET kullanılıyor.");
+            secretKey = new TextEncoder().encode('DEV_ONLY_FALLBACK_SECRET_123');
+        } else {
+            throw new Error('JWT_SECRET is not defined in production for middleware.');
+        }
+    } else {
+        secretKey = new TextEncoder().encode(ENV_JWT_SECRET);
     }
-    secretKey = new TextEncoder().encode(ENV_JWT_SECRET);
 } catch (e: any) {
-    console.error("Middleware: JWT_SECRET yüklenirken hata:", e.message);
-    // Geliştirme için varsayılan veya hata fırlat
-    secretKey = new TextEncoder().encode('fallback-secret-for-middleware-dev-only');
+    console.error("Middleware: JWT_SECRET yüklenirken KRİTİK HATA:", e.message);
+    if (process.env.NODE_ENV === 'development') {
+        secretKey = new TextEncoder().encode('DEV_ONLY_FALLBACK_SECRET_ERROR_CASE');
+    } else {
+        // Bu durumda middleware'in çalışmaması için null bırakabiliriz veya hata fırlatabiliriz.
+        // Eğer null bırakırsak, aşağıdaki secretKey kontrolü devreye girer.
+        // Şimdilik null bırakalım, aşağıdaki kontrol yakalasın.
+        // secretKey = null as any; // Hata fırlatmak daha iyi olabilir
+        throw new Error('Failed to initialize JWT secret key for middleware due to config error.');
+    }
 }
+
+const ADMIN_API_PATHS = ['/api/admin/'];
 
 export const config = {
   matcher: [
+    // SADECE TOKEN GEREKTİREN API ROTALARI
     '/api/market/purchase/:path*',
     '/api/inventory/my-items/:path*',
-    '/envanter/:path*',
-    '/withdrawal/:path*',
-    '/pay/:path*',
-    '/profile/:path*',
+    '/api/admin/:path*', 
+    '/api/admin/items/:path*',
+    '/api/admin/users/:path*',
+    '/api/market/sell-item/:path*',
+    // '/api/users/:id/balance', // Eğer bu da token gerektiriyorsa eklenebilir
+    // '/api/profile/update',   // Eğer bu da token gerektiriyorsa eklenebilir
   ],
-  // runtime: 'nodejs', // Artık buna gerek yok, jose Edge Runtime'da çalışır
+  // runtime: 'edge', // jose için varsayılan Edge'dir, bu satır opsiyoneldir.
 };
 
 interface MyJwtPayload extends jose.JWTPayload {
     userId?: string | number;
     username?: string;
-    role?: string;
+    role?: 'user' | 'admin' | string;
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(`[Middleware] İstek geldi: ${request.method} ${pathname}`);
+  // console.log(`[Middleware] İstek (SADECE API İÇİN): ${request.method} ${pathname}`);
 
-  if (pathname.startsWith('/api/')) {
-    console.log('[Middleware] API yolu, token kontrolü yapılacak.');
-    const authorizationHeader = request.headers.get('authorization');
-    console.log('[Middleware] Authorization Header:', authorizationHeader);
+  // Middleware artık sadece matcher'daki API yolları için çalışacak.
+  // Bu yüzden isPotentiallyProtectedRoute kontrolüne gerek kalmadı.
 
-    let token = null;
-    if (authorizationHeader && authorizationHeader.startsWith('Bearer ')) {
-      token = authorizationHeader.split(' ')[1];
-      console.log('[Middleware] Bearer token bulundu:', token ? 'EVET' : 'HAYIR');
-    } else {
-      console.log('[Middleware] Bearer token formatı uygun değil veya Authorization header yok.');
-    }
+  const authorizationHeader = request.headers.get('authorization');
+  let token = null;
 
-    if (!token) {
-      console.log('[Middleware] Token bulunamadı. 401 döndürülüyor.');
-      return NextResponse.json(
-        { success: false, message: 'Erişim yetkiniz yok: Token bulunamadı.' },
-        { status: 401 }
-      );
-    }
-
-    try {
-      console.log('[Middleware] Token doğrulamaya çalışılıyor (jose ile)...');
-      const { payload } = await jose.jwtVerify<MyJwtPayload>(token, secretKey, {
-        // algorithms: ['HS256'], // Gerekirse algoritma belirtin
-      });
-      console.log('[Middleware] Token başarıyla doğrulandı (jose). Çözümlenmiş Payload:', payload);
-
-      const requestHeaders = new Headers(request.headers);
-      if (payload && payload.userId) {
-        requestHeaders.set('x-user-id', String(payload.userId));
-        console.log('[Middleware] x-user-id header AYARLANDI:', String(payload.userId));
-        if (payload.role) {
-          requestHeaders.set('x-user-role', String(payload.role));
-          console.log('[Middleware] x-user-role header AYARLANDI:', String(payload.role));
-        }
-      } else {
-        console.warn("[Middleware] UYARI: Token payload'ı 'userId' içermiyor. Payload:", payload);
-        return NextResponse.json(
-          { success: false, message: 'Geçersiz token yapısı: Kullanıcı kimliği bulunamadı.' },
-          { status: 401 }
-        );
-      }
-      console.log('[Middleware] İstek yeni headerlarla devam ettiriliyor.');
-      return NextResponse.next({ request: { headers: requestHeaders } });
-
-    } catch (error) {
-      const err = error as any;
-      console.error('[Middleware] JWT DOĞRULAMA HATASI (jose):', err.name, '-', err.message, err.code ? `(Code: ${err.code})` : '');
-      let errorMessage = 'Geçersiz veya süresi dolmuş token.';
-      if (err.code === 'ERR_JWT_EXPIRED') {
-        errorMessage = 'Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.';
-      } else if (err.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED' || err.code === 'ERR_JWS_INVALID' || err.code === 'ERR_JWT_CLAIM_VALIDATION_FAILED') {
-        errorMessage = `Token doğrulanamadı: ${err.message || err.code}`;
-      } else {
-        errorMessage = `Token hatası: ${err.message || err.name}`;
-      }
-      console.log(`[Middleware] ${errorMessage}. 401 döndürülüyor.`);
-      return NextResponse.json(
-        { success: false, message: errorMessage, errorCode: err.code, errorName: err.name },
-        { status: 401 }
-      );
-    }
+  if (authorizationHeader && authorizationHeader.startsWith('Bearer ')) {
+    token = authorizationHeader.split(' ')[1];
   }
 
-  console.log(`[Middleware] API yolu değil (${pathname}), istek devam ettiriliyor.`);
-  return NextResponse.next();
+  if (!token) {
+    // console.log('[Middleware] Token bulunamadı. 401 JSON yanıtı döndürülüyor.');
+    return NextResponse.json(
+      { success: false, message: 'Yetkilendirme tokenı bulunamadı.' },
+      { status: 401 }
+    );
+  }
+
+  if (!secretKey) { // secretKey yüklenememişse
+      console.error("[Middleware] KRİTİK: secretKey tanımlı değil, token doğrulanamıyor. API isteği reddediliyor.");
+      return NextResponse.json({ success: false, message: 'Sunucu yapılandırma hatası (auth).' }, { status: 500 });
+  }
+
+  try {
+    const { payload } = await jose.jwtVerify<MyJwtPayload>(token, secretKey);
+    // console.log('[Middleware] Token doğrulandı. Payload:', payload);
+
+    const requestHeaders = new Headers(request.headers);
+    if (payload && payload.userId) {
+      requestHeaders.set('x-user-id', String(payload.userId));
+      if (payload.role) {
+        requestHeaders.set('x-user-role', String(payload.role));
+      }
+    } else {
+      throw new Error('Token payload geçerli kullanıcı veya rol bilgisi içermiyor.');
+    }
+
+    const isAdminApiPath = ADMIN_API_PATHS.some(p => pathname.startsWith(p));
+    if (isAdminApiPath && payload.role !== 'admin') {
+      console.warn(`[Middleware] YETKİSİZ API ERİŞİM DENEMESİ (admin değil): Kullanıcı ${payload.userId} (${payload.role}) -> ${pathname}`);
+      return NextResponse.json({ success: false, message: 'Bu API işlemi için admin yetkisine sahip değilsiniz.' }, { status: 403 });
+    }
+    
+    return NextResponse.next({ request: { headers: requestHeaders } });
+
+  } catch (error: any) {
+    console.error('[Middleware] Token doğrulama hatası:', error.message, error.code ? `(Code: ${error.code})` : '');
+    let errorMessage = 'Geçersiz veya süresi dolmuş token.';
+    if (error.code === 'ERR_JWT_EXPIRED') {
+        errorMessage = 'Oturumunuzun süresi doldu.';
+    } else if (error.code === 'ERR_JWS_SIGNATURE_VERIFICATION_FAILED' || error.code === 'ERR_JWS_INVALID') {
+        errorMessage = `Token doğrulanamadı: ${error.message || error.code}`;
+    }
+    return NextResponse.json(
+      { success: false, message: errorMessage, errorDetails: error.message, errorCode: error.code },
+      { status: 401 }
+    );
+  }
 }
