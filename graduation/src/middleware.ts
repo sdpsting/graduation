@@ -43,6 +43,7 @@ export const config = {
     '/api/admin/items/:path*',
     '/api/admin/users/:path*',
     '/api/market/sell-item/:path*',
+    '/api/users/:path*',
     // '/api/users/:id/balance', // Eğer bu da token gerektiriyorsa eklenebilir
     // '/api/profile/update',   // Eğer bu da token gerektiriyorsa eklenebilir
   ],
