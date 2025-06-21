@@ -42,31 +42,108 @@ a {
 }
 
 .custom-background {
-  background-color: hsl(0, 0%, 10%);
+  background-color: #1a1a1a;
   margin: 0;
   padding: 0;
   min-height: 100vh;
   min-width: 100vh;
 }
 
+/* Ana navbar arka planı */
 .navbar-background {
   background-color: #282828;
+  border-bottom: 1px solid #2c323a;
 }
 
+/* Toggler ikonu (mobilde hamburger) */
+.navbar-background .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* Linkler */
 .nav-link {
-  margin-right: 25px; /* Sekmeler arasındaki boşluğu artırır */
-  color: white;
+  color: white !important;
+  transition: color 0.2s ease-in-out;
+  margin-left: 40px;
 }
 
-.sign-in-button {
-  width: 320px;
-  background-color: #c2a061; 
-  border: none; 
-  color: white; 
-  padding: 10px 0; 
-  font-size: 16px; 
-  text-align: center; 
-  border-radius: 10px;
+.nav-link.active {
+  color: #c2a061 !important;       /* Örneğin altın sarısı */
+  font-weight: 600;     /* İsteğe bağlı: daha kalın yazı */
+  border-top: 5px solid #c2a061;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #ffffff;
+}
+
+/* Marka logosu */
+.navbar-brand img {
+  width: 60px;
+  height: auto;
+  transition: transform 0.3s ease;
+  margin-left: 15px;
+}
+.navbar-brand:hover img {
+  transform: scale(1.1) ;
+}
+
+/* Bakiye alanı */
+.balance-container {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+}
+.balance-container .balance-label {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+}
+.balance-container .balance-amount {
+  font-size: 0.9rem;
+  color: #00ff00;
+  font-weight: 700;
+}
+
+/* Profil iconu */
+.account-logo {
+  cursor: pointer;
+  margin-right: 1rem;
+}
+.account-logo img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+/* Küçük butonlar */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.btn-sign-in {
+  background-color: #c2a061 !important;
+  margin-right: 35px;
+  margin-left: 10px;
+  color: white !important;
+  border: 1px solid white !important;
+  padding: 10px 80px !important;
+  transition: transform 0.3s ease !important;
+}
+
+.btn-sign-in:hover {
+  transform: scale(1.1);
+}
+
+/* Mobilde menü öğeleri arasına boşluk */
+@media (max-width: 992px) {
+  .navbar-collapse .nav-item {
+    margin-bottom: 0.5rem;
+  }
 }
 
 .search-bar {
@@ -192,30 +269,48 @@ a {
   border-radius: 10px;
   width: 100%;
   margin-right: 55px; 
+  border: 0.5px solid #282828;
 }
 
 .card-items .card-img-top {
-  width: 100%;
+  width: 80%;
   height: auto; 
+  margin-top: 10px;
+
 }
 .card-items:hover {
   transform: scale(1.05);
   background-color: #3a3a3a;
+  border: 0.5px solid #c2a061;
 }
 
-.card-items .card-body h5 {
-  padding-left: 10px;
-  color: #ffffff; 
-  font-size: 0.9rem; 
-  font-weight: 100;
+.custom-item-title {
+  font-size: 0.9rem;        /* Daha büyük yazı */
+  font-weight: 400;       /* Kalınlık */
+  color: #ffffff !important;         /* Beyaz yazı */
+  line-height: 1.3;
+  letter-spacing: 0.3px; /* ← harfler arası boşluk */
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;  /* Maksimum 2 satır */
+  -webkit-box-orient: vertical;
 }
 
-.card-items .card-body p {
-  color: #ffffff;
-  padding-left: 10px;
-  padding-bottom: 10px;
-  font-size: 1.2rem;
-  font-weight: 400;
+.custom-price-tag {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: white;         /* Bootstrap warning sarısı */
+  margin-bottom: 0.25rem;
+}
+
+.custom-old-price {
+  font-size: 0.8rem;
+  color: #999; /* soluk gri */
+  text-decoration: line-through;
+  margin-bottom: 0.25rem;
 }
 
 /* Login Sayfası */
@@ -549,23 +644,23 @@ h1 {
 
 /*wear colors*/
 .factory-new {
-  color: #0a570a;
+  color: #08a008 !important;
 }
 
 .minimal-wear {
-  color: yellowgreen;
+  color: yellowgreen !important;
 }
 
 .field-tested {
-  color: #9e9e15;
+  color: #9e9e15 !important;
 }
 
 .well-worn {
-  color: orange;
+  color: orange !important;
 }
 
 .battle-scarred {
-  color: #91300a;
+  color: #a81f15 !important;
 }
 
 .apply-button {
@@ -583,7 +678,7 @@ h1 {
   width: 100%;
   background-color: #b12f2fa6;
   color: white;
-  margin-top: 20px;
+  margin-top: 10px;
   border-radius: 5px;
   padding: 4px;
   font-weight: 700;
@@ -608,83 +703,24 @@ h1 {
 }
 
 /* modal.css */
-.modal-overlay {
-  position: fixed; /* Sabit pozisyon, tüm ekranı kaplar */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.712); /* Daha koyu bir arka plan */
-  display: flex; /* İçeriği ortalamak için flexbox */
-  justify-content: center; /* Yatayda ortala */
-  align-items: center; /* Dikeyde ortala */
-  z-index: 1050; /* Diğer içeriklerin üzerinde görünmesini sağlar */
+/* Modal arka planı */
+.modal-backdrop.show {
+    background-color: rgba(0, 0, 0, 0.8) !important;
 }
 
-.modal-dialog {
-  position: relative; /* İçindeki öğelerin pozisyonlandırılması için */
-  width: auto;
-  background-color: #282828;
-  border-radius: 5px;
+/* İçerik kartı */
+.custom-modal-content {
+  background-color: #2e2e2e !important;
+  color: #fff;
+  border: 1px solid #c2a061 !important;
+  border-radius: 0.5rem;
 }
 
-.modal-content {
-  color: white; /* Metin rengi (isteğe bağlı) */
-  border-radius: 0.5rem; /* Köşeleri yuvarlaklaştır (isteğe bağlı) */
-  width: 70%;
-  height: 70%;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: center; /* Başlığı ortalamak için */
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #495057; /* Ayırıcı çizgi (isteğe bağlı) */
-  margin-left: 5px; /* Header'ı biraz köşeden uzaklaştırmak için */
-}
-
-.modal-title {
-  margin-bottom: 0;
-  font-size: 1.5rem;
-  color: white;
-}
-
-.btn-close {
-  padding: 0.5rem 0.5rem;
-  margin: -0.5rem -0.5rem -0.5rem auto;
-  background: transparent url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='%23fff' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill-rule='evenodd' d='M1.5 1.5a.5.5 0 0 1 .707 0L8 7.293l6.793-6.793a.5.5 0 0 1 .707.707L8.707 8l6.793 6.793a.5.5 0 0 1-.707.707L8 8.707l-6.793 6.793a.5.5 0 0 1-.707-.707L7.293 8 1.5 1.5z'/%3e%3c/svg%3e") center/1em auto no-repeat;
-  border: 0;
-  border-radius: 0.25rem;
-  opacity: 0.5;
-}
-
-.btn-close:hover {
-  opacity: 0.75;
-}
-
-.modal-body {
-  padding: 55px;
-  text-align: center; /* İçeriği ortalamak için (isteğe bağlı) */
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #495057; /* Ayırıcı çizgi (isteğe bağlı) */
-}
-
-.open-steam {
-  width: 100%;
-  background-color: #c2a061;
-  color: white;
-  margin-top: 20px;
-  border-radius: 5px;
-  padding: 8px;
-  font-weight: 700;
-  text-decoration: none;
-  margin-bottom: 20px;
+/* Görsel boyutlandırma */
+.custom-modal-img {
+  max-height: 300px;
+  object-fit: contain;
+  margin-top: 30px;
 }
 
 /* Buton grup ayarları - Butonları yan yana hizalamak için */
@@ -696,50 +732,72 @@ h1 {
 }
 
 /* Camera ve büyüteç butonları kare şeklinde, diğer butonlarla aynı boyutta */
-.custom-btn {
-  background-color: #ff7300;
-  color: white;
-  border: none;
-  padding: 10px 15px; /* Diğer butonlarla aynı boyutta */
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  justify-content: center; /* İkonu ortalar */
-  align-items: center; /* İkonu dikeyde ortalar */
-  border-radius: 5px; /* Butonun köşelerini yuvarlatmak için */
-  width: 70px; /* Diğer butonla aynı genişlik */
-  height: 70px; /* Diğer butonla aynı yükseklik */
+.modal-buy-btn {
+  background-color: #c2a061 !important;
+  color: white !important;
+  border: 2px solid white !important;
+  padding: 5px 10px !important; /* Diğer butonlarla aynı boyutta */
+  font-weight: bold !important;
+  cursor: pointer !important;
+  display: flex !important;
+  justify-content: center !important; /* İkonu ortalar */
+  align-items: center !important; /* İkonu dikeyde ortalar */
+  border-radius: 5px !important; /* Butonun köşelerini yuvarlatmak için */
+  width: 100% !important; /* Diğer butonla aynı genişlik */
+  height: 50px !important; /* Diğer butonla aynı yükseklik */
 }
 
-.custom-btn:hover {
-  background-color: #ff5722;
+.modal-buy-btn:hover {
+  background-color: #9e824d !important;
 }
 
-.custom-btn:active {
-  transform: scale(0.98); /* Tıklama efektine ekleme */
+.modal-buy-btn:active {
+  transform: scale(0.98) !important; /* Tıklama efektine ekleme */
 }
 
-.custom-btn i {
-  font-size: 22px; /* İkon boyutunu uygun şekilde küçültmek için */
-  margin: 0; /* Metni kaldırdığımız için margin'i sıfırlıyoruz */
+.modal-buy-btn i {
+  font-size: 22px !important; /* İkon boyutunu uygun şekilde küçültmek için */
+  margin: 0 !important; /* Metni kaldırdığımız için margin'i sıfırlıyoruz */
 }
 
 /* Eğer butonların üzerine sadece ikon istiyorsanız, aşağıdaki stil kullanılabilir */
-.custom-btn span {
-  display: none; /* Metni gizle */
+.modal-buy-btn span {
+  display: none !important; /* Metni gizle */
 }
 
 /* Steam butonunun özelliklerini değiştirmedik, aynı şekilde kalacak */
 .open-steam {
-  width: 100%;
-  background-color: #c2a061;
-  color: white;
-  margin-top: 20px;
+  width: 45%;
+  background-color: #2a475e !important;
+  color: white !important;
+  border: 1px solid white !important;
   border-radius: 5px;
   padding: 8px;
   font-weight: 700;
   text-decoration: none;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  height: 45px;
+}
+
+.open-steam:hover {
+  background-color: #21384b !important;
+
+}
+
+.modal-inspect-btn {
+  width: 45%;
+  height: 45px;
+  margin-top: 10px;
+  background-color: #424242 !important;
+  border: 1px solid white !important;
+  border-radius: 5px;
+  padding: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.modal-inspect-btn:hover {
+  background-color: #333333 !important;
 }
 
 /* Silah türü kutusu konteyneri */
@@ -764,7 +822,8 @@ h1 {
   color: #fff;                /* Yazı beyaz */
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
-  margin-right: 33px;
+  margin-right: 10px;
+  width: 233px;
 }
 
 /* Hover efekti */
@@ -791,23 +850,6 @@ h1 {
   background-color: #282828; /* İstediğin rengi buraya yaz */
 }
 
-
-.amount-input {
-  background-color: #414141 !important;
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition: border-color 0.2s;
-  box-shadow: none !important;
-
-}
-
-.amount-input:focus {
-  box-shadow: none !important;
-  outline: none !important;
-  
-}
-
 /* Buton stil */
 .sign-in-button {
   background-color: #c2a061;
@@ -830,4 +872,306 @@ h1 {
     max-width: 90%;
     margin: 0 auto;
   }
+}
+
+
+
+/* globals.css */
+
+/* 1) box-sizing’i tüm ilgili elemanlara uygula */
+.filter-container .search-bar,
+.filter-container .price-range,
+.filter-container .search-icon {
+  box-sizing: border-box;
+}
+
+/* 2) Normal durumda search-bar ve price-range input’lar */
+.filter-container .search-bar,
+.filter-container .price-range {
+  background-color: #444 !important;
+  color: #fff !important;
+  height: 31px;
+
+  border: 0.5px solid #fff !important;
+
+  border-radius: 5px;
+
+  /* search-bar için solunu kaldırmak istiyorsan: */
+  /* sadece .search-bar’a uygula */
+}
+
+.filter-container .search-bar {
+  border-left: none !important; 
+}
+
+
+/* 3) Normal durumda search-icon */
+.filter-container .search-icon {
+  background-color: #444 !important;
+  border: 0.5px solid #fff !important;
+  border-right: none;
+}
+
+/* 4) Focus (tıklama) durumunda */
+.filter-container .search-bar:focus,
+.filter-container .price-range:focus {
+  box-shadow: none !important;            /* Bootstrap gölgesini iptal et */
+  border-color: #c2a061 !important;       /* sarı border */
+}
+
+.filter-container .input-group:focus-within .search-icon {
+  border-color: #c2a061 !important;       /* sarı border */
+}
+
+/* 5) İkon renkleri */
+.filter-container .search-icon .bi-search {
+  color: #eeeeec !important;
+}
+
+.filter-container .input-group:focus-within .search-icon .bi-search {
+  color: #c2a061 !important;
+}
+
+
+/* 1) Kutuların boyutunu border ile koru */
+.filter-container .search-bar,
+.filter-container .price-range,
+.filter-container .search-icon {
+  box-sizing: border-box;               /* border içe katılsın */
+}
+
+/* 2) Normal durum: tüm kenarlıklar 0.5px beyaz */
+.filter-container .search-bar,
+.filter-container .price-range {
+  background-color: #444 !important;
+  color: #fff !important;
+  border: 0.5px solid #fff !important;
+}
+
+.filter-container .search-bar  {
+  border-left: none !important;
+}
+
+.filter-container .search-icon {
+  background-color: #444 !important;
+  border: 0.5px solid #fff !important;
+  border-right: none !important;
+}
+
+/* 3) Focus (tıklanma) durumunda renkleri sarıya çevir, gölgeyi iptal et */
+.filter-container .search-bar:focus,
+.filter-container .price-range:focus {
+  box-shadow: none !important;
+  border-color: #c2a061 !important;
+  outline: none;                         /* outline tamamen kaldır */
+}
+
+.filter-container .input-group:focus-within .search-icon {
+  border-color: #c2a061 !important;
+}
+
+/* 4) İkonların renk geçişi */
+.filter-container .search-icon .bi-search {
+  color: #eeeeec !important;
+  transition: color 0.2s;
+}
+
+.filter-container .input-group:focus-within .search-icon .bi-search {
+  color: #c2a061 !important;
+}
+
+/* Aşınmışlık */
+
+.custom-wear-checkbox {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  width: 50px;
+  height: 35px;
+  background-color: #444; /* Gri arkaplan */
+  border: 2px solid white; /* Beyaz kenarlık */
+  border-radius: 5px;
+  text-align: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 30px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  margin-right: 9.6px;
+}
+
+.custom-wear-checkbox input {
+  opacity: 0;
+  position: absolute;
+  height: 0;
+  width: 0;
+}
+
+.custom-wear-checkbox span {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Seçili olduğunda */
+.custom-wear-checkbox input:checked + span {
+  background-color: #c2a061;
+  border-radius: 4px;
+}
+
+.btn-purchase {
+  background-color: #c2a061;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  width: 95%;
+  border-radius: 5px;
+  height: 30px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 5px;
+  border: 1px solid white;
+}
+
+.btn-purchase:disabled {
+  background-color: #6c757d;
+  opacity: 0.7;
+}
+
+.custom-background {
+  background-color: hsl(0, 0%, 10%);
+  min-height: 100vh;
+}
+.custom-background h1,
+.custom-background h2,
+.custom-background h3,
+.custom-background h4,
+.custom-background h5,
+.custom-background h6,
+.custom-background p,
+.custom-background label,
+.custom-background small,
+.custom-background .alert {
+  color: #e0e0e0;
+}
+.custom-background .alert-danger {
+  color: #f8d7da !important;
+  background-color: rgba(245, 198, 203, 0.188);
+  border-color: rgba(245, 194, 199, 0.314) !important;
+}
+.custom-background .alert-success {
+  color: #0f5132 !important;
+  background-color: rgba(209, 231, 221, 0.188);
+  border-color: rgba(186, 219, 204, 0.314) !important;
+}
+.custom-background .alert-info {
+  color: #084298 !important;
+  background-color: rgba(207, 226, 255, 0.188);
+  border-color: rgba(182, 212, 254, 0.314) !important;
+}
+.custom-background .text-warning {
+  color: #ffc107 !important;
+}
+.custom-background .text-info {
+  color: #0dcaf0 !important;
+}
+.text-muted-custom {
+  color: #868e96 !important;
+}
+
+/* Inventory card interactions */
+.inventory-card {
+  background-color: #282828 !important;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border-radius: 10px;
+  width: 100%;
+  margin-right: 55px; 
+  border: 0.5px solid #282828;
+}
+.inventory-card:hover {
+  transform: translateY(-5px);
+  box-shadow: none;
+  border: 1px solid #c2a061;
+}
+.selected-card {
+  border-color: #c2a061 !important;
+  box-shadow: none !important;
+}
+.bg-dark-accent {
+  background-color: #282828 !important;
+}
+
+/* Utility classes */
+
+.inventory-text {
+  color: white;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+
+
+.spinner-large {
+  width: 3rem;
+  height: 3rem;
+}
+
+.btn-withdrawal {
+  background-color: #c2a061 !important;
+  color: white !important;
+  border: 2px solid white !important;
+  font-size: large !important;
+  height: 50px;
+  font-weight: 600 !important;
+}
+
+.btn-sell {
+  background-color: #3c6e3c !important;
+  color: white !important;
+  border: 2px solid white !important;
+  font-size: large !important;
+  height: 50px;
+  font-weight: 600 !important;
+}
+
+.custom-text-sell {
+  color: #398b39 !important;
+}
+
+.card-img-thumb {
+  max-height: 150px;
+  object-fit: contain;
+}
+.card-img-selected {
+  max-height: 250px;
+  object-fit: contain;
+}
+.card-title-small {
+  min-height: 2.4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.sticky-offset {
+  top: 20px;
+}
+
+.order {
+  background-color: #444444 !important;
+  color: white !important;
+  border: 1px solid white !important;
+}
+
+.order:focus {
+  box-shadow: none !important;
+}
+
+.order option:hover {
+  box-shadow: none !important;
+  background-color: white !important;
 }

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import * as jose from 'jose';
 
+
 // Config dosyasının yolu middleware'e göre ./config/config.ts olmalı
 import { JWT_SECRET as ENV_JWT_SECRET } from './config/config'; 
 

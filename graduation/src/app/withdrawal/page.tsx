@@ -37,12 +37,12 @@ export default function WithdrawalPage() {
 
   const getWearColorClass = (wear: string): string => {
     switch (wear) {
-      case 'Factory New': return 'factory-new-class';
-      case 'Minimal Wear': return 'minimal-wear-class';
-      case 'Field-Tested': return 'field-tested-class';
-      case 'Well-Worn': return 'well-worn-class';
-      case 'Battle-Scarred': return 'battle-scarred-class';
-      default: return 'text-secondary';
+      case 'Factory New': return 'factory-new';
+      case 'Minimal Wear': return 'minimal-wear';
+      case 'Field-Tested': return 'field-tested';
+      case 'Well-Worn': return 'well-worn';
+      case 'Battle-Scarred': return 'battle-scarred';
+      default: return 'text-white';
     }
   };
 
@@ -214,7 +214,6 @@ export default function WithdrawalPage() {
     <div className="custom-background text-white min-vh-100">
       <Navbar />
       <div className="container-fluid mt-4">
-        <h1 className="text-center mb-4 text-warning">Envanterim / Eşya Yönetimi</h1>
         
         {/* Sadece işlem sonrası mesajları göster, error zaten yukarıda handle ediliyor */}
         {message && message.type !== 'error' && (
@@ -233,7 +232,7 @@ export default function WithdrawalPage() {
                 {inventory.map((item) => (
                   <div className="col-6 col-md-4 col-lg-3" key={item.inventory_id}>
                     <div 
-                      className={`card h-100 bg-dark text-white inventory-card ${selectedItem?.inventory_id === item.inventory_id ? 'selected-card' : ''}`}
+                      className={`inventory-card h-100 d-flex flex-column position-relative ${selectedItem?.inventory_id === item.inventory_id ? 'selected-card' : ''}`}
                       onClick={() => handleItemSelect(item)}
                       style={{cursor: 'pointer'}}
                     >
@@ -268,7 +267,7 @@ export default function WithdrawalPage() {
                   <p className="small"><small>Satın Alma Tarihi: {new Date(selectedItem.purchase_date).toLocaleDateString()}</small></p>
                   
                   <button 
-                    className="btn btn-warning w-100 mb-3 mt-2"
+                    className="btn btn-withdrawal w-100 mb-3 mt-2"
                     onClick={handleWithdrawItem}
                     disabled={processingAction !== null}
                   >
@@ -278,10 +277,10 @@ export default function WithdrawalPage() {
                   <hr className="my-3"/>
                   <h6>Pazara Geri Sat</h6>
                   {selectedItem.price_at_purchase !== null && (
-                    <p className="small text-muted-custom">
+                    <p className="small text-white">
                         Alış Fiyatı: ${selectedItem.price_at_purchase.toFixed(2)}<br/>
                         Tavsiye Edilen: 
-                        <strong className="text-info ms-1" title="Alış fiyatınızın %3 altında (veya sizin belirlediğiniz marj)">${recommendedSellPrice}</strong>
+                        <strong className="custom-text-sell ms-1" title="Alış fiyatınızın %3 altında (veya sizin belirlediğiniz marj)">${recommendedSellPrice}</strong>
                     </p>
                   )}
                   <div className="input-group mb-2">
@@ -297,7 +296,7 @@ export default function WithdrawalPage() {
                     />
                   </div>
                   <button 
-                    className="btn btn-info w-100"
+                    className="btn btn-sell w-100"
                     onClick={handleSellToMarketAction}
                     disabled={processingAction !== null || !sellPriceInput || parseFloat(sellPriceInput) <= 0}
                   >
@@ -313,30 +312,6 @@ export default function WithdrawalPage() {
           </div>
         </div>
       </div>
-      <style jsx global>{`
-        .custom-background { background-color: hsl(0, 0%, 10%) ; min-height: 100vh; }
-        .custom-background h1, .custom-background h2, .custom-background h3, .custom-background h4, .custom-background h5, .custom-background h6, .custom-background p, .custom-background label, .custom-background small, .custom-background .alert {
-             color: #e0e0e0; 
-        }
-        .custom-background .alert-danger { color: #f8d7da !important; background-color: #f5c6cb30 !important; border-color: #f5c2c750 !important;}
-        .custom-background .alert-success { color: #0f5132 !important; background-color: #d1e7dd30 !important; border-color: #badbcc50 !important;}
-        .custom-background .alert-info { color: #084298 !important; background-color: #cfe2ff30 !important; border-color: #b6d4fe50 !important;}
-        .custom-background .text-warning { color: #ffc107 !important; }
-        .custom-background .text-info { color: #0dcaf0 !important; }
-        .text-muted-custom { color: #868e96 !important; }
-
-        .inventory-card { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; border: 1px solid #333; }
-        .inventory-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(255, 193, 7, 0.1); }
-        .selected-card { border-color: #ffc107 !important; box-shadow: 0 0 15px rgba(255, 193, 7, 0.3) !important; }
-        .bg-dark-accent { background-color: #2c2c44; }
-        
-        .factory-new-class { color: #6a9ff3 !important; font-weight: bold; }
-        .minimal-wear-class { color: #87ceeb !important; font-weight: bold; }
-        .field-tested-class { color: #ffdead !important; font-weight: bold; }
-        .well-worn-class { color: #d2691e !important; font-weight: bold; }
-        .battle-scarred-class { color: #a52a2a !important; font-weight: bold; }
-        .card-title.small { min-height: 2.4em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-      `}</style>
     </div>
   );
 }
