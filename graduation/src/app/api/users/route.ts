@@ -9,7 +9,7 @@ export async function GET() {
       host: 'localhost',
       user: 'root',
       password: '1234',
-      database: 'userdb',
+      database: 'marketdb',
     });
 
     const [users] = await connection.execute<RowDataPacket[]>(
