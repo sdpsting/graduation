@@ -186,12 +186,6 @@ export default function ProfilePage() {
               >
                 Profil Bilgileri
               </button>
-              <button
-                className={`tab-button btn btn-outline-light w-100 ${selectedTab === 'payment' ? 'active' : ''}`}
-                onClick={() => handleTabChange('payment')}
-              >
-                Ödeme
-              </button>
             </div>
           </div>
         </div>
