@@ -1,0 +1,66 @@
+[
+  {
+    "id": "faq-1",
+    "question": "Sitemde nasıl işlem yapabilirim?",
+    "answer_html": "<p>Sitemize üye olduktan sonra, Counter Strike 2 eşyalarınızı satın alabilir veya satabilirsiniz. Satış yapmak için, envanterinizden eşya seçerek satışa çıkartabilir, satın almak için istediğiniz eşyayı sepete ekleyerek ödeme işlemini tamamlayabilirsiniz.</p>",
+    "category": "Genel İşlemler",
+    "order": 1,
+    "is_active": true
+  },
+  {
+    "id": "faq-2",
+    "question": "Eşyalarımı nasıl satabilirim?",
+    "answer_html": "<p>Eşyalarınızı satabilmek için, öncelikle sitemize üye olmanız gerekmektedir. Üyeliğinizi oluşturduktan sonra, envanterinizden satmak istediğiniz eşyayı seçin, fiyat belirleyin ve satışa sunun. Satış işlemi tamamlandığında, kazancınız hesabınıza aktarılacaktır.</p>",
+    "category": "Satış İşlemleri",
+    "order": 2,
+    "is_active": true
+  },
+  {
+    "id": "faq-3",
+    "question": "Eşyaların fiyatları nasıl belirleniyor?",
+    "answer_html": "<p>Eşyaların fiyatları, piyasa talebine ve sitemizdeki mevcut satış fiyatlarına göre belirlenir. Kullanıcılar, eşyalarını istedikleri fiyatla satışa çıkarabilir, ancak sitemiz, aşırı yüksek veya düşük fiyatları engellemek için belirli bir aralıkta fiyat düzenlemesi yapabilir.</p>",
+    "category": "Fiyatlandırma",
+    "order": 3,
+    "is_active": true
+  },
+  {
+    "id": "faq-4",
+    "question": "Ödemeyi nasıl yapabilirim?",
+    "answer_html": "<p>Ödemeler, kredi kartı, banka transferi veya sitemizdeki diğer ödeme yöntemleriyle yapılabilir. Ödeme işlemi, güvenli ödeme altyapımız aracılığıyla gerçekleşir ve bilgilerinizin güvenliği sağlanır.</p>",
+    "category": "Ödeme",
+    "order": 4,
+    "is_active": true
+  },
+  {
+    "id": "faq-5",
+    "question": "Eşyalarımı nasıl alabilirim?",
+    "answer_html": "<p>Eşyaları almak için, sitemizdeki mağaza sekmesinden veya kullanıcılar tarafından satılan eşyalardan seçim yapabilirsiniz. Beğendiğiniz eşyayı sepete ekleyip ödeme işlemini tamamladıktan sonra, eşya hesabınıza aktarılır.</p>",
+    "category": "Alış İşlemleri",
+    "order": 5,
+    "is_active": true
+  },
+  {
+    "id": "faq-6",
+    "question": "Satın aldığım eşyalar ne zaman hesabıma gelir?",
+    "answer_html": "<p>Satın alma işlemi tamamlandıktan sonra, eşyalarınız genellikle 15 dakika içinde hesabınıza aktarılır. Ancak, bazı durumlarda işlemlerin tamamlanması birkaç dakika sürebilir.</p>",
+    "category": "Teslimat",
+    "order": 6,
+    "is_active": true
+  },
+  {
+    "id": "faq-7",
+    "question": "Hesabımda sorun yaşarsam ne yapmalıyım?",
+    "answer_html": "<p>Herhangi bir sorunla karşılaştığınızda, destek ekibimizle iletişime geçebilirsiniz. İletişim bilgilerimiz sitemizin \"İletişim\" sekmesinde yer almaktadır.</p>",
+    "category": "Destek",
+    "order": 7,
+    "is_active": true
+  },
+  {
+    "id": "faq-8",
+    "question": "Sitemiz ne kadar güvenli?",
+    "answer_html": "<p>Sitemiz, kullanıcı güvenliğini ön planda tutarak gelişmiş şifreleme ve güvenlik önlemleri kullanmaktadır. Ödemeler, güvenli ödeme altyapılarımızla yapılır ve kişisel bilgileriniz korunur.</p>",
+    "category": "Güvenlik",
+    "order": 8,
+    "is_active": true
+  }
+]

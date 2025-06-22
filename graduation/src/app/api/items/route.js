@@ -1,77 +1,72 @@
 // src/app/api/items/route.js
-
 import { NextResponse } from 'next/server';
-import { createPool } from 'mysql2/promise'; // createConnection yerine createPool kullanmak daha iyidir
+import { createPool } from 'mysql2/promise';
 
-// Veritabanı bağlantı bilgileri (Pool için de aynı şekilde kullanılabilir)
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '1234', // .env.local dosyanızda olmalı
   database: process.env.DB_NAME || 'marketdb',
-  waitForConnections: true, // Pool için
-  connectionLimit: 10,    // Pool için
-  queueLimit: 0           // Pool için
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  // charset: 'utf8mb4_unicode_ci' // Gerekirse karakter seti
 };
 
-// Bağlantı havuzu oluştur (uygulama başladığında bir kez)
 let pool;
 try {
     pool = createPool(dbConfig);
-    console.log("[ITEMS API] Database pool created successfully.");
+    console.log("[ITEMS API] Veritabanı bağlantı havuzu başarıyla oluşturuldu.");
 } catch (error) {
-    console.error("[ITEMS API] Failed to create database pool:", error);
+    console.error("[ITEMS API] Veritabanı bağlantı havuzu oluşturulamadı:", error);
     // Pool oluşturulamazsa, API istekleri hata verecektir.
     // Bu durumu handle etmek için bir mekanizma eklenebilir veya uygulamanın başlaması engellenebilir.
 }
-
 
 export async function GET(request) {
   let connection;
   try {
     if (!pool) {
-        // Bu log, pool'un bir önceki try-catch'te oluşup oluşmadığını anlamamıza yardımcı olur.
-        console.error("[ITEMS API] Database pool is not available.");
+        console.error("[ITEMS API] Veritabanı havuzu mevcut değil. İstek işlenemiyor.");
         return NextResponse.json(
           { message: "Sunucu yapılandırma hatası: Veritabanı bağlantısı kurulamadı." },
           { status: 500 }
         );
     }
 
-    // console.log(`[ITEMS API] Attempting to get connection from pool...`);
     connection = await pool.getConnection();
-    // console.log("[ITEMS API] Successfully connected to the database via pool.");
+    // console.log("[ITEMS API] Havuzdan bağlantı başarıyla alındı.");
 
-    // ---- SQL SORGUSU GÜNCELLENDİ: previous_price ve seller_id eklendi ----
+    // ---- SQL SORGUSU GÜNCELLENDİ: seller_name users tablosundan JOIN ile eklendi ----
     const query = `
       SELECT 
-        id, 
-        name, 
-        image, 
-        wears, 
-        price, 
-        previous_price, -- İndirim hesaplaması için
-        inspect, 
-        ingame, 
-        status, 
-        category_name,
-        seller_id  
-      FROM items
-      WHERE status = 'available' 
+        i.id, 
+        i.name, 
+        i.image, 
+        i.wears, 
+        i.price, 
+        i.previous_price,
+        i.inspect, 
+        i.ingame, 
+        i.status, 
+        i.category_name,
+        i.seller_id,
+        u.user_name AS seller_name 
+      FROM items i
+      LEFT JOIN users u ON i.seller_id = u.id 
+      WHERE i.status = 'available' 
+      ORDER BY i.id DESC
     `;
     // --------------------------------------------------------------------
     
-    // console.log("[ITEMS API] Executing query:", query);
     const [rows] = await connection.execute(query);
-    // console.log(`[ITEMS API] Query successful, ${rows.length} items fetched.`);
+    // console.log(`[ITEMS API] Sorgu başarılı, ${rows.length} item çekildi.`);
 
-    return NextResponse.json(rows); // rows zaten bir dizi, doğrudan döndür
+    return NextResponse.json(rows);
 
   } catch (error) {
     console.error("API /api/items GET hatası:", error.message);
-    if (error.sqlMessage) {
-      console.error("SQL Error:", error.sqlMessage, "SQL State:", error.sqlState, "Error No:", error.errno);
-    }
+    // if (error.sqlMessage) { /* ... */ } // Bu kısım aynı kalabilir
     return NextResponse.json(
       { 
         message: "Ürünler yüklenirken bir sunucu hatası oluştu.", 
@@ -84,8 +79,8 @@ export async function GET(request) {
   } finally {
     if (connection) {
       try {
-        connection.release(); // Havuzdan alınan bağlantıyı serbest bırak
-        // console.log("[ITEMS API] Database connection released back to the pool.");
+        connection.release();
+        // console.log("[ITEMS API] Veritabanı bağlantısı havuza geri bırakıldı.");
       } catch (releaseError) {
         console.error("[ITEMS API] Bağlantı serbest bırakılırken hata:", releaseError.message);
       }

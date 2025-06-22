@@ -1,0 +1,42 @@
+[
+  {
+    "id": "blog-post-1",
+    "slug": "counter-strike-2-guncellemesi-1-nisan-2025",
+    "title": "📅 1 Nisan 2025 - Counter-Strike 2 Güncellemesi",
+    "date": "2025-04-01",
+    "content_html": "<h4>Haftalık Ödül Paketi</h4><p>Haftalık Ödül Paketi listesine üç yeni silah koleksiyonu eklendi: Ascent, Boreal ve Radiant.</p><p>Haftalık Ödül Paketi listesinden dört silah koleksiyonu kaldırıldı: Bank, Italy, Lake ve orijinal Train koleksiyonu.</p><h4>Cephanelik</h4><p>Yeni Cephanelik içeriği eklendi: Train 2025 Koleksiyonu, Ateş Kasası. Yeni bir sınırlı sürüm eşyası: XM1014 | Issızlık.</p><h4>Haritalar</h4><p><strong>Inferno:</strong> Muz bölgesi, CS:GO'daki boyutuna benzeyecek şekilde değiştirildi. T rampasının arka planı sadeleştirildi.</p><p><strong>Train:</strong> Bombalama alanı A'nın ana girişinin üstündeki pencerelerden oyuncu gölgelerinin görülebildiği hata düzeltildi.</p>",
+    "is_published": true
+  },
+  {
+    "id": "blog-post-2",
+    "slug": "counter-strike-2-guncellemesi-21-mart-2025",
+    "title": "📅 21 Mart 2025 - Counter-Strike 2 Güncellemesi",
+    "date": "2025-03-21",
+    "content_html": "<h4>Haritalar</h4><p>Basalt haritası Steam Atölyesi'ndeki son sürümle güncellendi. Güncelleme notlarına buradan ulaşabilirsiniz.</p><h4>Atölye</h4><p>Counter-Strike 2 Steam Atölyesi'ne Sosisli Süsler için desen oluşturma ve gönderme desteği eklendi.</p>",
+    "is_published": true
+  },
+  {
+    "id": "blog-post-3",
+    "slug": "counter-strike-2-guncellemesi-28-subat-2025",
+    "title": "📅 28 Şubat 2025 - Counter-Strike 2 Güncellemesi",
+    "date": "2025-02-28",
+    "content_html": "<h4>Haritalar</h4><p>Inferno: Kazan girişinden görünür olan kilisedeki çatı geometrisi düzeltildi.</p><h4>Çeşitli</h4><p>Bir Steam Atölyesi haritasından çıkıldıktan sonra sesli sohbetin çalışmaması düzeltildi.</p>",
+    "is_published": true
+  },
+  {
+    "id": "blog-post-4",
+    "slug": "counter-strike-2-guncellemesi-14-subat-2025",
+    "title": "📅 14 Şubat 2025 - Counter-Strike 2 Güncellemesi",
+    "date": "2025-02-14",
+    "content_html": "<h4>Arayüz</h4><p>Satın alma menüsü ve oyun içi gösterge arasında paylaşılan kullanıcı arayüzü öğelerinin boyutu ve ölçeklenmesi düzeltildi.</p><p>CSTV izleyicileri için zırh görüntüleme hatası düzeltildi.</p><h4>Atölye</h4><p>Counter-Strike 2 Steam Atölye haritaları için desteklenen yükleme boyutu 3 GB'a çıkarıldı.</p>",
+    "is_published": true
+  },
+  {
+    "id": "blog-post-5",
+    "slug": "counter-strike-2-guncellemesi-7-subat-2025",
+    "title": "📅 7 Şubat 2025 - Counter-Strike 2 Güncellemesi",
+    "date": "2025-02-07",
+    "content_html": "<h4>Seçkin</h4><p>Oyuncuların CS derecelerinin, eşleştirmeye birlikte katılmak için birbirinden çok farklı olduğu durumları belirleyen mantıkta ayarlamalar yapıldı.</p><h4>Arayüz</h4><p>\"Hizmet Madalyası Al\" kullanıcı arayüzü öğesi doğrudan ana menüdeki profil kartına eklendi.</p>",
+    "is_published": true
+  }
+]

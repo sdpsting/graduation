@@ -1,184 +1,167 @@
+// src/app/sss/page.tsx
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // next/navigation kullanımı
 import React, { useState, useEffect } from 'react';
-import Navbar from 'src/app/components/navbar'; // Navbar bileşeni eklendi
+import Navbar from 'src/app/components/navbar';
+// CSS dosyanızı import edin
+// import 'src/app/admin/admin-styles.css'; // Örnek
 
-type Item = {
-  name: string;
-  image: string;
+type FaqItem = {
+  id: string;
+  question: string;
+  answer_html: string;
+  category: string;
+  order: number;
+  is_active: boolean; // API'den geliyor ama şu anki gösterimde kullanılmıyor
 };
 
 export default function FAQComponent() {
-  const [selectedFilters, setSelectedFilters] = useState({
-    searchQuery: '',
-    priceRange: { min: 0, max: 1000 },
-  });
-
-  const [user, setUser] = useState<{ name: string } | null>(null);
-  const [items, setItems] = useState<Item[]>([]);
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Router burada next/navigation'dan geliyor
+  const [openAccordion, setOpenAccordion] = useState<string | null>(null); // Hangi S.S.S. açık
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
-    fetch('/api/items')
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setItems(data);
-          setError(null);
-        } else {
-          console.error('Beklenmeyen veri formatı:', data);
-          setError('Beklenmeyen veri formatı');
-          setItems([]);
+    setLoading(true);
+    setError(null); // Önceki hataları temizle
+    fetch('/api/faq') // API endpoint'imiz
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(errData => {
+            throw new Error(errData.message || 'S.S.S. yüklenemedi.');
+          }).catch(() => {
+            throw new Error(`S.S.S. yüklenemedi. Sunucu hatası: ${res.status}`);
+          });
         }
+        return res.json();
       })
-      .catch((error) => {
-        console.error('Veri çekme hatası:', error);
-        setError('Veri çekme hatası');
-        setItems([]);
-      });
+      .then((data: FaqItem[]) => {
+        // API zaten aktif ve sıralanmışları dönüyor
+        setFaqs(data);
+      })
+      .catch(err => {
+        console.error("FAQ fetch error:", err);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedFilters((prevState) => ({
-      ...prevState,
-      searchQuery: e.target.value,
-    }));
+  const toggleAccordion = (id: string) => {
+    setOpenAccordion(openAccordion === id ? null : id);
   };
 
-  const handlePriceRangeChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
-    const value = Number(e.target.value);
-    setSelectedFilters((prevState) => ({
-      ...prevState,
-      priceRange: {
-        ...prevState.priceRange,
-        [type]: value,
-      },
-    }));
-  };
+  if (loading) {
+    return (
+        <div className="container-fluid custom-background"> {/* CSS'inizdeki class */}
+            <Navbar />
+            <div className="container mt-5 text-white text-center">
+                <div className="spinner-border text-warning" role="status">
+                    <span className="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p className="mt-2">S.S.S. yükleniyor...</p>
+            </div>
+        </div>
+    );
+  }
+  if (error) {
+    return (
+        <div className="container-fluid custom-background"> {/* CSS'inizdeki class */}
+            <Navbar />
+            <div className="container mt-5">
+                <div className="alert alert-danger text-center">Hata: {error}</div>
+            </div>
+        </div>
+    );
+  }
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-  };
-
-  const handleBalanceClick = () => {
-    router.push('/payment'); // Ödeme sayfasına yönlendirme
-  };
-
-  const handleProfileClick = () => {
-    // Profil sayfasına yönlendir
-    router.push('/profile');
-  };
+  // S.S.S.'leri kategoriye göre grupla (opsiyonel ama daha düzenli gösterim için iyi)
+  const groupedFaqs: Record<string, FaqItem[]> = faqs.reduce((acc, faq) => {
+    const category = faq.category || 'Diğer Sorular'; // Kategorisi olmayanlar için varsayılan
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(faq);
+    return acc;
+  }, {} as Record<string, FaqItem[]>);
 
   return (
-    <div className="container-fluid custom-background">
+    <div className="container-fluid custom-background"> {/* CSS'inizdeki class */}
       <Navbar />
+      <div className="container mt-5"> {/* Sadece container kullandım, faq-container'a gerek yok */}
+        <h1 className="text-center text-white mb-5">Sıkça Sorulan Sorular</h1>
 
-      <div className="faq-container d-flex mt-4">
-        {/* Sol menü */}
-        <div className="faq-sidebar">
-          <h3 className="text-white mb-4">Sıkça Sorulan Sorular</h3>
-          
-          <div className="faq-menu">
-            <div className="menu-section mb-4">
-              <div className="menu-item text-white-50 mb-2">
-                1. Sitemde nasıl işlem yapabilirim?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                2. Eşyalarımı nasıl satabilirim?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                3. Eşyaların fiyatları nasıl belirleniyor?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                4. Ödemeyi nasıl yapabilirim?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                5. Eşyalarımı nasıl alabilirim?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                6. Satın aldığım eşyalar ne zaman hesabıma gelir?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                7. Hesabımda sorun yaşarsam ne yapmalıyım?
-              </div>
-              <div className="menu-item text-white-50 mb-2">
-                8. Sitemiz ne kadar güvenli?
-              </div>
+        {Object.keys(groupedFaqs).length === 0 && !loading && (
+            <p className="text-center alert alert-info">S.S.S. bulunamadı.</p>
+        )}
+
+        {Object.entries(groupedFaqs).map(([category, itemsInCategory]) => (
+          <div key={category} className="mb-5">
+            <h2 className="text-white mb-4 pb-2 border-bottom">{category}</h2>
+            <div className="accordion" id={`faqAccordion-${category.replace(/\s+/g, '-')}`}>
+              {itemsInCategory.map((faq, index) => (
+                <div className="accordion-item faq-accordion-item" key={faq.id}>
+                  <h2 className="accordion-header" id={`heading-${faq.id}`}>
+                    <button 
+                      className={`accordion-button faq-accordion-button ${openAccordion !== faq.id ? 'collapsed' : ''}`}
+                      type="button" 
+                      onClick={() => toggleAccordion(faq.id)}
+                      aria-expanded={openAccordion === faq.id}
+                      aria-controls={`collapse-${faq.id}`}
+                    >
+                      {faq.question}
+                    </button>
+                  </h2>
+                  <div 
+                    id={`collapse-${faq.id}`}
+                    className={`accordion-collapse collapse ${openAccordion === faq.id ? 'show' : ''}`}
+                    aria-labelledby={`heading-${faq.id}`}
+                    // data-bs-parent={`#faqAccordion-${category.replace(/\s+/g, '-')}`} // Eğer accordion group davranışı isteniyorsa
+                  >
+                    <div className="accordion-body faq-accordion-body"
+                         dangerouslySetInnerHTML={{ __html: faq.answer_html }} />
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-
-        {/* Sağ içerik alanı */}
-        <div className="faq-content">
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">1. Sitemde nasıl işlem yapabilirim?</h2>
-            <p className="text-white-50">
-                Sitemize üye olduktan sonra, Counter Strike 2 eşyalarınızı satın alabilir veya satabilirsiniz. Satış yapmak için, envanterinizden eşya seçerek satışa çıkartabilir, satın almak için istediğiniz eşyayı sepete ekleyerek ödeme işlemini tamamlayabilirsiniz.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">2. Eşyalarımı nasıl satabilirim?</h2>
-            <p className="text-white-50">
-                Eşyalarınızı satabilmek için, öncelikle sitemize üye olmanız gerekmektedir. Üyeliğinizi oluşturduktan sonra, envanterinizden satmak istediğiniz eşyayı seçin, fiyat belirleyin ve satışa sunun. Satış işlemi tamamlandığında, kazancınız hesabınıza aktarılacaktır.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">3. Eşyaların fiyatları nasıl belirleniyor?</h2>
-            <p className="text-white-50">
-                Eşyaların fiyatları, piyasa talebine ve sitemizdeki mevcut satış fiyatlarına göre belirlenir. Kullanıcılar, eşyalarını istedikleri fiyatla satışa çıkarabilir, ancak sitemiz, aşırı yüksek veya düşük fiyatları engellemek için belirli bir aralıkta fiyat düzenlemesi yapabilir.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">4. Ödemeyi nasıl yapabilirim?</h2>
-            <p className="text-white-50">
-                Ödemeler, kredi kartı, banka transferi veya sitemizdeki diğer ödeme yöntemleriyle yapılabilir. Ödeme işlemi, güvenli ödeme altyapımız aracılığıyla gerçekleşir ve bilgilerinizin güvenliği sağlanır.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">5. Eşyalarımı nasıl alabilirim?</h2>
-            <p className="text-white-50">
-                Eşyaları almak için, sitemizdeki mağaza sekmesinden veya kullanıcılar tarafından satılan eşyalardan seçim yapabilirsiniz. Beğendiğiniz eşyayı sepete ekleyip ödeme işlemini tamamladıktan sonra, eşya hesabınıza aktarılır.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">6. Satın aldığım eşyalar ne zaman hesabıma gelir?</h2>
-            <p className="text-white-50">
-                Satın alma işlemi tamamlandıktan sonra, eşyalarınız genellikle 15 dakika içinde hesabınıza aktarılır. Ancak, bazı durumlarda işlemlerin tamamlanması birkaç dakika sürebilir.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">7. Hesabımda sorun yaşarsam ne yapmalıyım?</h2>
-            <p className="text-white-50">
-                Herhangi bir sorunla karşılaştığınızda, destek ekibimizle iletişime geçebilirsiniz. İletişim bilgilerimiz sitemizin "İletişim" sekmesinde yer almaktadır.
-            </p>
-          </div>
-
-          <div className="content-section mb-5">
-            <h2 className="text-white mb-4">8. Sitemiz ne kadar güvenli?</h2>
-            <p className="text-white-50">
-                Sitemiz, kullanıcı güvenliğini ön planda tutarak gelişmiş şifreleme ve güvenlik önlemleri kullanmaktadır. Ödemeler, güvenli ödeme altyapılarımızla yapılır ve kişisel bilgileriniz korunur.
-            </p>
-          </div>
-          
-          
-        </div>
+        ))}
       </div>
+      {/* S.S.S. için ek stiller (Bootstrap accordion'u özelleştirmek için) */}
+      <style jsx global>{`
+        .faq-accordion-item {
+            background-color: #282828; /* CSS'inizdeki .update-box rengi */
+            border: 1px solid #444;
+            margin-bottom: 0.5rem;
+        }
+        .faq-accordion-button {
+            background-color: #343a40; /* Koyu gri */
+            color: #f8f9fa; /* Açık renk */
+            font-weight: 500;
+            border-radius: 0 !important; /* Köşeleri sıfırla */
+        }
+        .faq-accordion-button:not(.collapsed) {
+            background-color: #c2a061; /* CSS'inizdeki altın rengi */
+            color: #212529; /* Koyu metin */
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+        }
+        .faq-accordion-button:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25); /* Odaklanma rengi */
+        }
+        .faq-accordion-button::after { /* Bootstrap ok ikonu rengi */
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        .faq-accordion-button:not(.collapsed)::after {
+            filter: none; /* Açıkken normal renk */
+        }
+        .faq-accordion-body {
+            background-color: #2c2c2c; /* Biraz daha açık bir arkaplan */
+            color: #e0e0e0; /* Cevap metni rengi */
+        }
+        .faq-accordion-body p:last-child {
+            margin-bottom: 0;
+        }
+      `}</style>
     </div>
   );
 }
