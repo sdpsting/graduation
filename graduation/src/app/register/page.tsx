@@ -62,8 +62,8 @@ export default function RegisterPage() {
     <div>
       <Navbar />
       {/* Register Page Content */}
-      <div className="d-flex flex-column justify-content-center align-items-center vh-100 custom-login-background">
-        <div className="p-4 shadow custom-login-card" style={{ maxWidth: '400px', width: '100%' }}>
+      <div className="d-flex flex-column justify-content-center align-items-center custom-login-background">
+        <div className="p-4 shadow custom-login-card" style={{ maxWidth: '500px', width: '100%' }}>
           <h2 className="text-center mb-4 text-white">Kayıt Ol</h2>
           {error && <div className="alert alert-danger">{error}</div>}
           <form onSubmit={handleRegister}>

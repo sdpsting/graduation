@@ -315,11 +315,12 @@ a {
 
 /* Login Sayfası */
 .custom-login-background {
-  background-color: hsl(0, 0%, 9%);
-  margin: 0;
-  padding: 0;
-  min-height: 10vh;
-  min-width: 100vh;
+  background-image: url('/assets/background.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: 100vh;
+  color: #ffffff;
 }
 
 .custom-login-card {
@@ -1362,17 +1363,26 @@ h1 {
   font-weight: 500;
 }
 
-.card-wrapper input.form-control {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid #4a5568;
+/* Giriş alanları: pay-input sınıfı */
+.card-wrapper .pay-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0;
+  padding: 0.75rem 0.5rem;
   color: #edf2f7;
+  transition: border-color 0.3s;
 }
 
-.card-wrapper input.form-control:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: #c2a061;
+.card-wrapper .pay-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.card-wrapper .pay-input:focus {
   outline: none;
-  box-shadow: 0 0 0 0.2rem rgba(229, 62, 62, 0.25);
+  border-bottom-color: #c2a061;
+  box-shadow: none;
 }
 
 /* Buton stili */
@@ -1398,4 +1408,8 @@ h1 {
 /* Uyarı mesajları */
 .alert {
   margin-top: 1rem;
+}
+
+.text-update {
+  color: #c2a061 !important;
 }

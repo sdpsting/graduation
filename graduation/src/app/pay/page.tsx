@@ -99,6 +99,20 @@ export default function PayPage() {
     }
   }, [isLoadingPage, isAuthenticated, router]);
 
+  const handleCardNumberChange = (value: string) => {
+    const digitsOnly = value.replace(/\D/g, '').slice(0, 16);
+    const formatted = digitsOnly.replace(/(.{4})/g, '$1 ').trim();
+    setCardNumber(formatted);
+  };
+
+  const handleExpiryChange = (value: string) => {
+    let digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length >= 3) {
+      digits = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    }
+    setCardExpiry(digits);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -124,7 +138,10 @@ export default function PayPage() {
       const token = localStorage.getItem('token');
       const res = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({ balance: balance + amountToAdd, card: { number: cardNumber.replace(/\s+/g, ''), expiry: cardExpiry, cvc: cardCvc } })
       });
       const data = await res.json();
@@ -155,23 +172,60 @@ export default function PayPage() {
         <div className="card-wrapper">
           <h2>Bakiye & Ödeme</h2>
           {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label>Tutar ($)</label>
-              <input type="number" value={newBalanceInput} onChange={e => setNewBalanceInput(e.target.value)} min="1" step="0.01" disabled={!isBalanceLoaded || loadingForm} required />
+          <form onSubmit={handleSubmit} className="mt-4">
+            <div className="mb-3 input-icon">
+              <input
+                type="number"
+                placeholder="Tutar ($)"
+                className="pay-input"
+                value={newBalanceInput}
+                onChange={e => setNewBalanceInput(e.target.value)}
+                min="1"
+                step="0.01"
+                disabled={!isBalanceLoaded || loadingForm}
+                required
+              />
             </div>
-            <div className="mb-3">
-              <label>Kart Numarası</label>
-              <input type="text" value={cardNumber} onChange={e => setCardNumber(e.target.value)} placeholder="1234 5678 9012 3456" disabled={!isBalanceLoaded || loadingForm} required />
+            <div className="mb-3 input-icon">
+              <input
+                type="text"
+                placeholder="Kart Numarası"
+                className="pay-input"
+                value={cardNumber}
+                onChange={e => handleCardNumberChange(e.target.value)}
+                maxLength={19} // 16 rakam + 3 boşluk
+                inputMode="numeric"
+                required
+                disabled={!isBalanceLoaded || loadingForm}
+              />
             </div>
             <div className="row">
-              <div className="col-6 mb-3">
-                <label>Son Kullanma (MM/YY)</label>
-                <input type="text" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)} placeholder="MM/YY" disabled={!isBalanceLoaded || loadingForm} required />
+              <div className="col-6">
+                <div className="mb-3 input-icon">
+                  <input
+                    type="text"
+                    placeholder="MM/YY"
+                    className="pay-input"
+                    value={cardExpiry}
+                    onChange={e => handleExpiryChange(e.target.value)}
+                    maxLength={5}
+                    disabled={!isBalanceLoaded || loadingForm}
+                    required
+                  />
+                </div>
               </div>
-              <div className="col-6 mb-3">
-                <label>CVC</label>
-                <input type="text" value={cardCvc} onChange={e => setCardCvc(e.target.value)} placeholder="123" disabled={!isBalanceLoaded || loadingForm} required />
+              <div className="col-6">
+                <div className="mb-3 input-icon">
+                  <input
+                    type="text"
+                    placeholder="CVC"
+                    className="pay-input"
+                    value={cardCvc}
+                    onChange={e => setCardCvc(e.target.value)}
+                    disabled={!isBalanceLoaded || loadingForm}
+                    required
+                  />
+                </div>
               </div>
             </div>
             <button type="submit" disabled={loadingForm || !isBalanceLoaded}>

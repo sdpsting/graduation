@@ -77,8 +77,8 @@ export default function LoginPage() {
   return (
     <>
       <Navbar />
-      <div className="d-flex justify-content-center align-items-center vh-100 custom-login-background">
-        <div className="p-4 shadow custom-login-card" style={{ maxWidth: '400px', width: '100%' }}>
+      <div className="d-flex justify-content-center align-items-center custom-login-background">
+        <div className="p-4 shadow custom-login-card" style={{ maxWidth: '500px', width: '110%' }}>
           <h2 className="text-center mb-4 text-white">Giriş Yap</h2>
           {error && <div className="alert alert-danger" role="alert">{error}</div>}
           <form onSubmit={handleLogin}>

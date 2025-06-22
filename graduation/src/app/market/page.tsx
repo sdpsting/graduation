@@ -44,7 +44,7 @@ const defaultWearFilters: Record<string, boolean> = Object.keys(wearCodes).reduc
   {} as Record<string, boolean>
 );
 
-const weaponTypes = ['Gloves', 'Heavy', 'Knives', 'Pistols', 'Rifles', 'SMGs'];
+const weaponTypes = ['Eldiven', 'Ağır Silah', 'Bıçak', 'Tabanca', 'Tüfek', 'Hafif Makineli'];
 
 export default function FilterComponent() {
   const [originalItems, setOriginalItems] = useState<Item[]>([]);
