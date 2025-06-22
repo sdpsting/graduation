@@ -1,4 +1,3 @@
-// src/app/pay/page.tsx
 'use client';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,8 +21,12 @@ export default function PayPage() {
 
   const [balance, setBalance] = useState<number>(0);
   const [isBalanceLoaded, setIsBalanceLoaded] = useState(false);
-  
   const [newBalanceInput, setNewBalanceInput] = useState<string>('');
+
+  const [cardNumber, setCardNumber] = useState<string>('');
+  const [cardExpiry, setCardExpiry] = useState<string>('');
+  const [cardCvc, setCardCvc] = useState<string>('');
+
   const [loadingForm, setLoadingForm] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
@@ -39,7 +42,6 @@ export default function PayPage() {
           setUser(parsedUser);
           setIsAuthenticated(true);
 
-          // ---- BAKİYE ÇEKME İSTEĞİNE CACHE-BUSTING EKLENDİ ----
           fetch(`/api/users/${parsedUser.id}?timestamp=${new Date().getTime()}`, {
             method: 'GET',
             headers: {
@@ -50,70 +52,46 @@ export default function PayPage() {
               'Expires': '0',
             }
           })
-          // ---- CACHE-BUSTING SONU ----
             .then(res => {
               if (res.status === 401 || res.status === 403) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                localStorage.clear();
                 setIsAuthenticated(false);
                 throw new Error('Oturum geçersiz veya süresi dolmuş. Lütfen tekrar giriş yapın.');
               }
               if (!res.ok) {
-                return res.json().then(errData => {
-                    throw new Error(errData.message || `Kullanıcı bilgileri alınamadı (HTTP ${res.status}).`);
-                }).catch(() => {
-                    throw new Error(`Kullanıcı bilgileri alınamadı (HTTP ${res.status}).`);
-                });
+                return res.json().then(err => { throw new Error(err.message || `HTTP ${res.status}`); });
               }
               return res.json();
             })
             .then(data => {
-              if (data && data.user && (typeof data.user.balance === 'string' || typeof data.user.balance === 'number')) {
-                const apiBalance = parseFloat(String(data.user.balance)) || 0;
-                setBalance(apiBalance);
-                
-                // localStorage'daki kullanıcı bilgisini de API'den gelen güncel bakiye ile senkronize et
-                const updatedUserForStorage: User = { ...parsedUser, balance: apiBalance.toFixed(2) };
-                localStorage.setItem('user', JSON.stringify(updatedUserForStorage));
-                setUser(updatedUserForStorage); // user state'ini de güncelle
-
-              } else {
-                console.error("Beklenmeyen bakiye API yanıtı:", data);
-                throw new Error(data?.message || 'Bakiye bilgisi formatı yanlış veya eksik.');
-              }
+              const apiBalance = parseFloat(String(data.user.balance)) || 0;
+              setBalance(apiBalance);
+              const updated = { ...parsedUser, balance: apiBalance.toFixed(2) };
+              localStorage.setItem('user', JSON.stringify(updated));
+              setUser(updated);
               setIsBalanceLoaded(true);
             })
-            .catch(error => {
-              console.error('API Hatası (Bakiye Çekme):', error);
-              setMessage({ type: 'error', text: error.message || 'Bakiye çekilirken bir hata oluştu.' });
-              setIsBalanceLoaded(true);
-            })
-            .finally(() => {
-                setIsLoadingPage(false);
-            });
+            .catch(err => { setMessage({ type: 'error', text: err.message }); setIsBalanceLoaded(true); })
+            .finally(() => setIsLoadingPage(false));
         } else {
-          const errMsg = 'Geçersiz kullanıcı oturum bilgisi.';
-          setMessage({ type: 'error', text: errMsg });
-          setIsBalanceLoaded(true);
+          setMessage({ type: 'error', text: 'Geçersiz oturum bilgisi.' });
           setIsAuthenticated(false);
+          setIsBalanceLoaded(true);
           setIsLoadingPage(false);
         }
       } catch (e) {
-        console.error('localStorage parse hatası veya bakiye çekme sırasında hata:', e);
-        const errMsg = 'Oturum bilgileri okunamadı veya bakiye alınamadı. Lütfen tekrar giriş yapın.';
-        setMessage({ type: 'error', text: errMsg });
-        setIsBalanceLoaded(true);
+        localStorage.clear();
+        setMessage({ type: 'error', text: 'Oturum hatası. Lütfen tekrar giriş yapın.' });
         setIsAuthenticated(false);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+        setIsBalanceLoaded(true);
         setIsLoadingPage(false);
       }
     } else {
-      setIsBalanceLoaded(true);
       setIsAuthenticated(false);
+      setIsBalanceLoaded(true);
       setIsLoadingPage(false);
     }
-  }, []); // Sadece component ilk yüklendiğinde çalışır
+  }, []);
 
   useEffect(() => {
     if (!isLoadingPage && !isAuthenticated) {
@@ -121,163 +99,87 @@ export default function PayPage() {
     }
   }, [isLoadingPage, isAuthenticated, router]);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !isAuthenticated) {
-      setMessage({ type: 'error', text: 'İşlem için giriş yapmalısınız.' });
-      return;
-    }
+    if (!user) return;
 
     const amountToAdd = parseFloat(newBalanceInput);
     if (isNaN(amountToAdd) || amountToAdd <= 0) {
-      setMessage({ type: 'error', text: 'Lütfen geçerli bir pozitif tutar girin.' });
+      setMessage({ type: 'error', text: 'Pozitif tutar giriniz.' });
       return;
     }
-
-    const updatedBalance = balance + amountToAdd;
+    if (!/^\d{13,19}$/.test(cardNumber.replace(/\s+/g, ''))) {
+      setMessage({ type: 'error', text: 'Kart numarası hatalı.' }); return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+      setMessage({ type: 'error', text: 'Tarih MM/YY.' }); return;
+    }
+    if (!/^\d{3,4}$/.test(cardCvc)) {
+      setMessage({ type: 'error', text: 'CVC hatalı.' }); return;
+    }
 
     setLoadingForm(true);
     setMessage(null);
-
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        setMessage({ type: 'error', text: 'Yetkilendirme hatası. Lütfen tekrar giriş yapın.' });
-        setLoadingForm(false);
-        return;
-      }
-      
-      const headers: HeadersInit = { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      };
-
-      const response = await fetch(`/api/users/${user.id}`, {
+      const res = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
-        headers: headers,
-        body: JSON.stringify({ balance: updatedBalance }), 
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ balance: balance + amountToAdd, card: { number: cardNumber.replace(/\s+/g, ''), expiry: cardExpiry, cvc: cardCvc } })
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setMessage({ type: 'success', text: `${amountToAdd.toFixed(2)} $ bakiye başarıyla eklendi! Yeni Bakiye: ${updatedBalance.toFixed(2)} $` });
-        setBalance(updatedBalance); // Local state'i güncelle
-        setNewBalanceInput('');
-        
-        const updatedUserForStorage: User = { ...user, balance: updatedBalance.toFixed(2) };
-        localStorage.setItem('user', JSON.stringify(updatedUserForStorage)); // localStorage'ı da güncelle
-        setUser(updatedUserForStorage); // user state'ini de güncelle (eğer Navbar gibi yerler bunu kullanıyorsa)
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const newBal = balance + amountToAdd;
+        setBalance(newBal);
+        setMessage({ type: 'success', text: `${amountToAdd.toFixed(2)}$ yüklendi. Yeni bakiye: ${newBal.toFixed(2)}$` });
+        setNewBalanceInput(''); setCardNumber(''); setCardExpiry(''); setCardCvc('');
+        const updated = { ...user, balance: newBal.toFixed(2) };
+        localStorage.setItem('user', JSON.stringify(updated));
+        setUser(updated);
       } else {
-        setMessage({ type: 'error', text: data.message || 'Bakiye güncelleme başarısız.' });
+        setMessage({ type: 'error', text: data.message || 'Güncelleme başarısız.' });
       }
-    } catch (error: any) {
-      console.error('Bakiye Güncelleme Hatası:', error);
-      setMessage({ type: 'error', text: error.message || 'Bakiye güncellenirken bir ağ hatası oluştu.' });
+    } catch (e: any) {
+      setMessage({ type: 'error', text: 'Ağ hatası.' });
     }
     setLoadingForm(false);
   };
-  
-  if (isLoadingPage) {
-    return (
-      <>
-        <Navbar />
-        <div className="custom-background text-white min-vh-100 d-flex justify-content-center align-items-center">
-          <div>
-            <div className="spinner-border text-warning" role="status" style={{width: "3rem", height: "3rem"}}>
-                <span className="visually-hidden">Yükleniyor...</span>
-            </div>
-            <p className="mt-3 h5">Yükleniyor...</p>
-          </div>
-        </div>
-      </>
-    );
-  }
 
-  if (!isAuthenticated) {
-    // Bu kısım genellikle useEffect içindeki router.replace() nedeniyle kısa süreliğine görünür veya hiç görünmez.
-    return (
-      <>
-        <Navbar />
-        <div className="custom-background text-white min-vh-100 d-flex flex-column justify-content-center align-items-center">
-          <p className="h5">Bu sayfayı görüntülemek için giriş yapmalısınız.</p>
-          <p>Giriş sayfasına yönlendiriliyorsunuz...</p>
-        </div>
-      </>
-    );
-  }
+  if (isLoadingPage) return (<><Navbar /><div className="loader">Yükleniyor...</div></>);
+  if (!isAuthenticated) return (<><Navbar /><div className="auth-msg">Giriş gerekli. Yönlendiriliyorsunuz...</div></>);
 
   return (
-    <div className="custom-background text-white min-vh-100">
+    <div className="page-bg">
       <Navbar />
       <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div className="payment-card bg-dark p-4 p-md-5 rounded shadow">
-              <h2 className="text-custom text-center mb-4 text-warning">Bakiye Yükle</h2>
-
-              {message && (
-                <div className={`alert ${message.type === 'success' ? 'alert-success' : (message.type === 'info' ? 'alert-info' : 'alert-danger')} mt-3`} role="alert">
-                  {message.text}
-                </div>
-              )}
-              
-              {user && (
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-4 text-center">
-                    <label className="form-label fs-5 d-block">Mevcut Bakiyeniz</label>
-                    <p className="display-5 text-custom fw-bold text-success">
-                      {isBalanceLoaded ? `${Number(balance).toFixed(2)} $` : 
-                        (<span className="spinner-border spinner-border-sm text-light"></span>)
-                      }
-                    </p>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="amountToAdd" className="form-label">Yüklenecek Tutar ($)</label>
-                    <input
-                      type="number"
-                      id="amountToAdd"
-                      className="form-control amount-input bg-secondary text-white border-secondary"
-                      placeholder="Örn: 50"
-                      value={newBalanceInput}
-                      onChange={e => setNewBalanceInput(e.target.value)}
-                      min="1"
-                      step="0.01"
-                      required
-                      disabled={!isBalanceLoaded || loadingForm}
-                    />
-                  </div>
-
-                  <div className="d-grid">
-                    <button
-                      className="sign-in-button btn btn-primary w-100 mt-3"
-                      type="submit"
-                      disabled={loadingForm || !isBalanceLoaded || !user}
-                    >
-                      {loadingForm ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          İşleniyor...
-                        </>
-                      ) : (
-                        'Bakiyeyi Yükle'
-                      )}
-                    </button>
-                  </div>
-                </form>
-              )}
+        <div className="card-wrapper">
+          <h2>Bakiye & Ödeme</h2>
+          {message && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label>Tutar ($)</label>
+              <input type="number" value={newBalanceInput} onChange={e => setNewBalanceInput(e.target.value)} min="1" step="0.01" disabled={!isBalanceLoaded || loadingForm} required />
             </div>
-          </div>
+            <div className="mb-3">
+              <label>Kart Numarası</label>
+              <input type="text" value={cardNumber} onChange={e => setCardNumber(e.target.value)} placeholder="1234 5678 9012 3456" disabled={!isBalanceLoaded || loadingForm} required />
+            </div>
+            <div className="row">
+              <div className="col-6 mb-3">
+                <label>Son Kullanma (MM/YY)</label>
+                <input type="text" value={cardExpiry} onChange={e => setCardExpiry(e.target.value)} placeholder="MM/YY" disabled={!isBalanceLoaded || loadingForm} required />
+              </div>
+              <div className="col-6 mb-3">
+                <label>CVC</label>
+                <input type="text" value={cardCvc} onChange={e => setCardCvc(e.target.value)} placeholder="123" disabled={!isBalanceLoaded || loadingForm} required />
+              </div>
+            </div>
+            <button type="submit" disabled={loadingForm || !isBalanceLoaded}>
+              {loadingForm ? 'İşleniyor...' : 'Ödemeyi Yap'}
+            </button>
+          </form>
         </div>
       </div>
-      <style jsx global>{`
-        .custom-background { background-color: #12181b; color: #e0e0e0; }
-        .payment-card { /* İstediğiniz ek stiller */ }
-        .amount-input::placeholder { color: #a0a0a0; }
-        .amount-input:focus { background-color: #495057; color: #ffffff; border-color: #ffc107; box-shadow: 0 0 0 0.2rem rgba(255,193,7,.25); }
-      `}</style>
     </div>
   );
 }

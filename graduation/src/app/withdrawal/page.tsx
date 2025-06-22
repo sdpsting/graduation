@@ -84,7 +84,6 @@ export default function WithdrawalPage() {
         });
         setInventory(typedItems);
         if (typedItems.length === 0) {
-            setMessage({type: 'info', text: 'Envanterinizde marketten satın aldığınız eşya bulunmuyor.'});
         }
       } else {
         throw new Error(data.message || 'Envanter verileri alınamadı veya format yanlış.');
@@ -226,7 +225,9 @@ export default function WithdrawalPage() {
           <div className="col-md-8">
             <h3 className="text-light mb-3">Sahip Olduğunuz Eşyalar</h3>
             {inventory.length === 0 && !loadingInventory ? ( // Yükleme bittiyse ve envanter boşsa
-              <p className="alert alert-secondary">Envanterinizde marketten satın aldığınız eşya bulunmuyor.</p>
+                  <p className="alert alert-secondary bg-dark">
+                    Envanterinizde marketten satın aldığınız eşya bulunmuyor.
+                  </p>
             ) : (
               <div className="row g-3">
                 {inventory.map((item) => (
